@@ -1,0 +1,16 @@
+{
+    "id": "{751B2290-5D65-1759-A970-5B7CA5CAAA7A}",
+    "name": "EntsoeGateway",
+    "type": 2,
+    "vendor": "Entso-e",
+    "aliases": [],
+    "parentRequirements": [],
+    "childRequirements": [
+        "{6E413DE8-C9F0-5E7F-4A69-07993C271FDC}"
+    ],
+    "implemented": [
+        "{8ED8DB86-AFE5-57AD-D638-505C91A39397}"
+    ],
+    "prefix": "ESEGW",
+    "url": ""
+}

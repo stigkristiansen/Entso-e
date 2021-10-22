@@ -1,0 +1,16 @@
+{
+    "id": "{848322ED-FF00-6DFF-07AF-9EF143E943A3}",
+    "name": "DayAheadPrices",
+    "type": 3,
+    "vendor": "Entso-e",
+    "aliases": [],
+    "parentRequirements": [
+        "{8ED8DB86-AFE5-57AD-D638-505C91A39397}"
+    ],
+    "childRequirements": [],
+    "implemented": [
+        "{6E413DE8-C9F0-5E7F-4A69-07993C271FDC}"
+    ],
+    "prefix": "ESEDA",
+    "url": ""
+}
