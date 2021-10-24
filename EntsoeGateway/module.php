@@ -136,7 +136,7 @@ class EntsoeGateway extends IPSModule {
 		$return['requestid'] = $RequestId;
 		$return['result'] = $result->result;
 		
-		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Returning Exchange rates to requesting child with Ident %s. Result sent is %s...',  $ChildId, json_encode($return), 0);
+		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Returning Exchange rates to requesting child with Ident %s. Result sent is %s...',  $ChildId, json_encode($return)), 0);
 		$this->SendDataToChildren(json_encode(["DataID" => "{6E413DE8-C9F0-5E7F-4A69-07993C271FDC}", "ChildId" => $ChildId, "Buffer" => $return]));
 	}
 }
