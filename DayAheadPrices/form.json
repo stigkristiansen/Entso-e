@@ -1,5 +1,20 @@
 {
-    "elements": [],
+    "elements": [
+        { 
+            "type" :  "Image" , 
+            "image" :  "data:image/png;base64,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"
+        },
+        {  "type":"Label", "caption":"Day-Ahead Prices"},
+        {  "type":"Select", "name":"Area", "caption":"Area" , 
+            "options":[ 
+                {"caption":"Østlandet", "value":"NO1"}, 
+                {"caption":"Sørlandet", "value":"NO2"}, 
+                {"caption":"Vestlandet", "value":"NO3"}, 
+                {"caption":"Midtnorge", "value":"NO4"}, 
+                {"caption":"Nordnorge", "value":"NO5"} 
+            ] 
+        }
+    ],
     "actions": [],
     "status": []
 }

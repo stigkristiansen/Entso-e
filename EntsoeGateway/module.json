@@ -3,7 +3,7 @@
     "name": "EntsoeGateway",
     "type": 2,
     "vendor": "Entso-e",
-    "aliases": [],
+    "aliases": ["Entso-e Gateway"],
     "parentRequirements": [],
     "childRequirements": [
         "{6E413DE8-C9F0-5E7F-4A69-07993C271FDC}"

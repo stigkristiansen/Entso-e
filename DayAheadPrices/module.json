@@ -3,7 +3,7 @@
     "name": "DayAheadPrices",
     "type": 3,
     "vendor": "Entso-e",
-    "aliases": [],
+    "aliases": ["Day-Ahead Prices"],
     "parentRequirements": [
         "{8ED8DB86-AFE5-57AD-D638-505C91A39397}"
     ],
