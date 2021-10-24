@@ -179,7 +179,7 @@ class DayAheadPrices extends IPSModule {
 
 		$rates = array('Date' => $today);
 		$rates['Rates'] = $Rates;
-		$this->WriteAttributeString('Rates', $json_encode($rates));
+		$this->WriteAttributeString('Rates', json_encode($rates));
 	}
 
 	private function UpdatePrices(object $Prices) {
@@ -188,7 +188,7 @@ class DayAheadPrices extends IPSModule {
 
 		$prices = array('Date' => $today);
 		$prices['Prices'] = $Prices;
-		$this->WriteAttributeString('Prices', $json_encode($prices));
+		$this->WriteAttributeString('Prices', json_encode($prices));
 	}
 
 	private function InitTimer() {
