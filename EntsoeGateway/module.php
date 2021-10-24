@@ -130,7 +130,7 @@ class EntsoeGateway extends IPSModule {
 			throw new Exception(sprintf('Exchangerates.io returned invalid data. The returend data was %s', $return));
 		}
 
-		$if($result->result->success==false) {
+		if($result->result->success==false) {
 			throw new Exception(sprintf('Call to Exchangerates.io failed.The error was %s:%s',$result->result->error->code, $result->result->error->info));
 		}
 		
