@@ -120,7 +120,7 @@ class DayAheadPrices extends IPSModule {
 		}
 
 		if($fetchData) {
-			$this->$RequestData();
+			$this->RequestData();
 			return;
 		}
 
