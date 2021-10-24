@@ -131,7 +131,7 @@ class DayAheadPrices extends IPSModule {
 	}
 
 	public function ReceiveData($JSONString) {
-		$this->Debug(sprintf('Received data from parent. The data is %s', $JSONString));
+		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Received data from parent. The data is %s', $JSONString), 0);
 	}
 
 	private function InitTimer() {
