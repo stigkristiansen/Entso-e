@@ -16,7 +16,8 @@ class DayAheadPrices extends IPSModule {
 
 		$this->RegisterPropertyString('Area', 'NO1');
 
-		$this->RegisterAttributeString('Day', '');
+		$this->RegisterAttributeString('Prices', '');
+		$this->RegisterAttributeString('Rates', '');
 		
 		$this->RegisterProfileFloat('ESEDA.Price', 'Dollar', '', ' kr/kWt', 4);
 
@@ -86,52 +87,107 @@ class DayAheadPrices extends IPSModule {
 		$this->HandleData();
 	}
 
-	private function RequestData() {
+	private function RequestData(bool $Rates, bool $Prices) {
 		$guid = self::GUID();
-		$request[] = ['Function'=>'GetExchangeRates', 'RequestId'=>$guid, 'ChildId'=>(string)$this->InstanceID];
-		$request[] = ['Function'=>'GetDayAheadPrices', 'RequestId'=>$guid, 'ChildId'=>(string)$this->InstanceID];
-		
-		$this->SendDataToParent(json_encode(['DataID' => '{8ED8DB86-AFE5-57AD-D638-505C91A39397}', 'Buffer' => $request]));
+		$request = [];
+		if($Rates) {
+			$request[] = ['Function'=>'GetExchangeRates', 'RequestId'=>$guid, 'ChildId'=>(string)$this->InstanceID];
+		}
+		if($Prices) {
+			$request[] = ['Function'=>'GetDayAheadPrices', 'RequestId'=>$guid, 'ChildId'=>(string)$this->InstanceID];
+		}
+
+		if(count($requests)>0) {
+			$this->SendDataToParent(json_encode(['DataID' => '{8ED8DB86-AFE5-57AD-D638-505C91A39397}', 'Buffer' => $request]));
+		}
 	}
 
 	private function HandleData() {
+		$fetchPrices = $this->EvaluateAttribute('Prices');
+		$fetchRates  = $this->EvaluateAttribute('Rates');
+
+		if($fetchPrices||$fetchRates) {
+			$this->RequestData($fetchRates, $fetchPrices);
+		} else {
+			// Update variables....
+		}
+	}
+
+	private function EvaluateAttribute(string $Name) {
 		$fetchData = false;
 
 		$now = new DateTime('Now');
 		$today = $now->format('Y-m-d');
 
-		$data = $this->ReadAttributeString('Day');
+		$data = $this->ReadAttributeString($Name);
 		if(strlen($data)>0) {
 			$day = json_decode($data);
 
-			$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Data in attribute "Day" is "%s"', $data), 0);
+			$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Data in attribute "%s" is "%s"', $Name, $data), 0);
 			
 			if(isset($day->date)) {
 				if($day->date!=$today) {
-					$this->SendDebug(IPS_GetName($this->InstanceID), 'Attribute "Day" has old data! Fetching new data', 0);
+					$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Attribute "%s" has old data! Fetching new data', $Name), 0);
 					$fetchData = true;						
 				}
 			} else {
-				$this->SendDebug(IPS_GetName($this->InstanceID), 'Attribute "Day" has invalid data! Fetching new data', 0);
+				$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Attribute "%s" has invalid data! Fetching new data', $Name), 0);
 				$fetchData = true;
 			}
 		} else {
-			$this->SendDebug(IPS_GetName($this->InstanceID), 'Attribute "Day" is empty! Fetching new data', 0);
+			$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Attribute "%s" is empty! Fetching new data', $Name), 0);
 			$fetchData = true;
 		}
 
-		if($fetchData) {
-			$this->RequestData();
-			return;
-		}
-
-		$day = json_decode($data);
-			
-
+		return $fetchData;
 	}
 
 	public function ReceiveData($JSONString) {
 		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Received data from parent. The data is %s', $JSONString), 0);
+		$data = json_decode($JSONString);
+
+		if(isset($data->Buffer->Function)) {
+			$function = strtolower($data->Buffer->Function);
+			switch($function) {
+				case 'getexchangerates':
+					$rates = $data->Buffer->Result;
+					$this->UpdateRates($rates);
+					$this->HandleData();
+					break;
+				case 'getdayaheadrrices':
+					$prices = $data->Buffer->Result;
+					$this->UpdatePrices($rates);
+					$this->HandleData();
+					break;
+				default:
+					$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Unsupported function "%s"', $function), 0);
+			}
+			
+			$result = $data->Buffer->result;
+
+			return;
+		}
+
+		$this->SendDebug(IPS_GetName($this->InstanceID), 'Invalid data received from parent', 0);
+
+	}
+
+	private function UpdateRates(object $Rates) {
+		$now = new DateTime('Now');
+		$today = $now->format('Y-m-d');
+
+		$rates = array('Date' => $today);
+		$rates['Rates'] = $Rates;
+		$this->WriteAttributeString('Rates', $json_encode($rates));
+	}
+
+	private function UpdatePrices(object $Prices) {
+		$now = new DateTime('Now');
+		$today = $now->format('Y-m-d');
+
+		$prices = array('Date' => $today);
+		$prices['Prices'] = $Prices;
+		$this->WriteAttributeString('Prices', $json_encode($prices));
 	}
 
 	private function InitTimer() {

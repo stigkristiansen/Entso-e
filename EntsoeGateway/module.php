@@ -100,7 +100,12 @@ class EntsoeGateway extends IPSModule {
 			throw new Exception('Missing API key for Entso-e');
 		}
 
-		$return = 'Day-Ahead Prices';
+		// Call API
+		
+		$return = array('Function' => 'GetDayAheadPrices');
+		$return['RequestId'] = $RequestId;
+		//$return['Result'] = $result->result;
+		$return['Result'] = '{"Prices":"None"}';
 		
 		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Returning day-Ahead Prices to requesting child with Ident %s. Result sent is %s...',  $ChildId, $return), 0);
 		$this->SendDataToChildren(json_encode(["DataID" => "{6E413DE8-C9F0-5E7F-4A69-07993C271FDC}", "ChildId" => $ChildId, "RequestId" => $RequestId,"Buffer" => $return]));
@@ -132,9 +137,9 @@ class EntsoeGateway extends IPSModule {
 			throw new Exception(sprintf('Call to Exchangerates.io failed.The error was %s:%s',$result->result->error->code, $result->result->error->info));
 		}
 
-		$return = array('function' => 'GetExchangeRates');
-		$return['requestid'] = $RequestId;
-		$return['result'] = $result->result;
+		$return = array('Function' => 'GetExchangeRates');
+		$return['RequestId'] = $RequestId;
+		$return['Result'] = $result->result;
 		
 		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Returning Exchange rates to requesting child with Ident %s. Result sent is %s...',  $ChildId, json_encode($return)), 0);
 		$this->SendDataToChildren(json_encode(["DataID" => "{6E413DE8-C9F0-5E7F-4A69-07993C271FDC}", "ChildId" => $ChildId, "Buffer" => $return]));
