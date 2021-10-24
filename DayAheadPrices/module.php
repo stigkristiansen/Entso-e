@@ -90,6 +90,7 @@ class DayAheadPrices extends IPSModule {
 	private function RequestData(bool $Rates, bool $Prices) {
 		$guid = self::GUID();
 		$request = [];
+		
 		if($Rates) {
 			$request[] = ['Function'=>'GetExchangeRates', 'RequestId'=>$guid, 'ChildId'=>(string)$this->InstanceID];
 		}
@@ -97,7 +98,7 @@ class DayAheadPrices extends IPSModule {
 			$request[] = ['Function'=>'GetDayAheadPrices', 'RequestId'=>$guid, 'ChildId'=>(string)$this->InstanceID];
 		}
 
-		if(count($requests)>0) {
+		if(count($request)>0) {
 			$this->SendDataToParent(json_encode(['DataID' => '{8ED8DB86-AFE5-57AD-D638-505C91A39397}', 'Buffer' => $request]));
 		}
 	}
