@@ -126,8 +126,8 @@ class DayAheadPrices extends IPSModule {
 
 			$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Data in attribute "%s" is "%s"', $Name, $data), 0);
 			
-			if(isset($day->date)) {
-				if($day->date!=$today) {
+			if(isset($day->Date)) {
+				if($day->Date!=$today) {
 					$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Attribute "%s" has old data! Fetching new data', $Name), 0);
 					$fetchData = true;						
 				}
@@ -155,18 +155,16 @@ class DayAheadPrices extends IPSModule {
 					$this->UpdateRates($rates);
 					$this->HandleData();
 					break;
-				case 'getdayaheadrrices':
+				case 'getdayaheadprices':
 					$prices = $data->Buffer->Result;
-					$this->UpdatePrices($rates);
+					$this->UpdatePrices($prices);
 					$this->HandleData();
 					break;
 				default:
 					$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Unsupported function "%s"', $function), 0);
 			}
 			
-			$result = $data->Buffer->result;
-
-			return;
+			
 		}
 
 		$this->SendDebug(IPS_GetName($this->InstanceID), 'Invalid data received from parent', 0);
@@ -194,8 +192,4 @@ class DayAheadPrices extends IPSModule {
 	private function InitTimer() {
 		$this->SetTimerInterval('EntoseDayAheadRefresh' . (string)$this->InstanceID, (self::SecondsToNextHour()+1)*1000); 
 	}
-
-
-
-	
 }
