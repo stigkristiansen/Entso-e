@@ -132,7 +132,7 @@ class DayAheadPrices extends IPSModule {
 
 	public function ReceiveData($JSONString) {
 		$data = json_decode($JSONString);
-		IPS_LogMessage('Device RECV', $data->Buffer);
+		IPS_LogMessage('Device RECV', $JSONString);
 	}
 
 	private function InitTimer() {
