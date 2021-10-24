@@ -46,6 +46,7 @@ class DayAheadPrices extends IPSModule {
 		parent::ApplyChanges();
 
 		$this->SetReceiveDataFilter('.*"ChildId":"' . (string)$this->InstanceID .'".*');
+		
 
 		if (IPS_GetKernelRunlevel() == KR_READY) {
 			$this->InitTimer();

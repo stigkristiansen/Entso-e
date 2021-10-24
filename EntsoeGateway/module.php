@@ -124,7 +124,7 @@ class EntsoeGateway extends IPSModule {
 			throw new Exception(sprintf('Failed to call Exchangerates.io. The error was %s:%s', (string)$result->httpcode, $result->errortext));
 		}
 		
-		$return = json_encode($result);
+		$return = json_encode($result->result);
 
 		if(!isset($result->result->success)) {
 			throw new Exception(sprintf('Exchangerates.io returned invalid data. The returend data was %s', $return));
@@ -135,6 +135,6 @@ class EntsoeGateway extends IPSModule {
 		}
 		
 		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Returning Exchange rates to requesting child with Ident %s. Result sent is %s...',  $ChildId, $return), 0);
-		$this->SendDataToChildren(json_encode(["DataID" => "{6E413DE8-C9F0-5E7F-4A69-07993C271FDC}", "ChildId" => $ChildId, "RequestId" => $RequestId,"Buffer" => $return]));
+		$this->SendDataToChildren(json_encode(["DataID" => "{6E413DE8-C9F0-5E7F-4A69-07993C271FDC}", "ChildId" => $ChildId, "RequestId" => $RequestId,"Buffer" => $result->result]));
 	}
 }
