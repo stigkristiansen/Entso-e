@@ -112,7 +112,7 @@ class EntsoeGateway extends IPSModule {
 		$params['out_Domain'] = $zone;
 		$params['periodStart'] = $periodStart;
 		$params['periodEnd'] = $periodEnd;
-		$params['documentType'] = 'A44'
+		$params['documentType'] = 'A44';
 
 		$result = $this->Request('get', self::DAY_AHEAD_BASE_URL, $params);
 
