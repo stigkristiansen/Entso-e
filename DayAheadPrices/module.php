@@ -156,7 +156,7 @@ class DayAheadPrices extends IPSModule {
 
 		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Prices from Entso-e are reported in %s', $reportedCurrency), 0);
 		if($this->ReadPropertyString('EntsoECurrency')!=$this->ReadPropertyString('ReportCurrency')) {
-			$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('1 %s is %s %S', $this->ReadPropertyString('EntsoECurrency'), (string)$rate, $this->ReadPropertyString('ReportCurrency')), 0);
+			$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('1 %s is %s %s', $this->ReadPropertyString('EntsoECurrency'), (string)$rate, $this->ReadPropertyString('ReportCurrency')), 0);
 		}
 		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Divider is: %s', (string)$divider), 0);
 		
