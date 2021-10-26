@@ -147,7 +147,7 @@ class DayAheadPrices extends IPSModule {
 			case 'SEK':
 				$rate = $rates->Rates->rates->SEK;
 				break;
-			case 'DKK'
+			case 'DKK':
 				$rate = $rates->Rates->rates->DKK;
 				break;
 		}
