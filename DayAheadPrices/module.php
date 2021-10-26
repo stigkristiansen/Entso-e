@@ -115,6 +115,14 @@ class DayAheadPrices extends IPSModule {
 	}
 
 	private function UpdateVariables() {
+		$data = json_decode($this->ReadAttributeString('Prices'));
+		$rates =  json_decode($this->ReadAttributeString('Rates'));
+
+		$rate = $rates->Rates->NOK;
+		$stats = $this->GetStats($data->Prices->Points);
+
+		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('1 EUR is %s NOK', $rate), 0);
+		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Calculated statistics: %s', $stats), 0);
 
 	}
 
@@ -192,5 +200,29 @@ class DayAheadPrices extends IPSModule {
 
 	private function InitTimer() {
 		$this->SetTimerInterval('EntoseDayAheadRefresh' . (string)$this->InstanceID, (self::SecondsToNextHour()+1)*1000); 
+	}
+
+	private function GetStats($Prices) {
+		$this->SendDebug(IPS_GetName($this->InstanceID), 'Calculating statistics...', 0);
+		$date = new DateTime('Now');
+		$currentIndex = $date->format('G');
+		
+		$stats = array('current' => (float)$Prices[$currentIndex]);
+		
+		sort($Prices, SORT_NUMERIC);
+		
+		$stats['high'] = (float)$Prices[count($Prices)-1];
+		$stats['low'] = (float)$Prices[0];
+		$stats['avg'] = (float)(array_sum($Prices)/count($Prices));
+
+		$count = count($Prices);
+		$index = floor($count/2);
+
+		$stats['median'] = $count%2==0?(float)($Prices[$index-1]+$Prices[$index])/2:(float)$Prices[$index];
+
+		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Calculated statistics: %s', json_encode($stats)), 0);
+
+		return (object)$stats;
+		
 	}
 }
