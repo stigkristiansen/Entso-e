@@ -118,7 +118,7 @@ class DayAheadPrices extends IPSModule {
 		$data = json_decode($this->ReadAttributeString('Prices'));
 		$rates =  json_decode($this->ReadAttributeString('Rates'));
 
-		$rate = $rates->Rates->rates->NOK
+		$rate = $rates->Rates->rates->NOK;
 		$stats = $this->GetStats($data->Prices->Points);
 		$divider = $data-Prices->MeasureUnit=='MWH'?1000:$data-Prices->MeasureUnit=='GWH'?1000000:1;
 		$reportedCurrency = $data-Prices->Currency;
@@ -128,7 +128,7 @@ class DayAheadPrices extends IPSModule {
 		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Divider is: %s', (string)$divider), 0);
 		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Calculated statistics: %s', json_encode($stats)), 0);
 		
-		
+
 
 	}
 
