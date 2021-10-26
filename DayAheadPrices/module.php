@@ -110,8 +110,12 @@ class DayAheadPrices extends IPSModule {
 		if($fetchPrices||$fetchRates) {
 			$this->RequestData($fetchRates, $fetchPrices);
 		} else {
-			// Update variables....
+			$this->UpdateVariables();
 		}
+	}
+
+	private function UpdateVariables() {
+
 	}
 
 	private function EvaluateAttribute(string $Name) {
@@ -153,18 +157,15 @@ class DayAheadPrices extends IPSModule {
 				case 'getexchangerates':
 					$rates = $data->Buffer->Result;
 					$this->UpdateRates($rates);
-					$this->HandleData();
 					break;
 				case 'getdayaheadprices':
 					$prices = $data->Buffer->Result;
 					$this->UpdatePrices($prices);
-					$this->HandleData();
+					$this->UpdateVariables()
 					break;
 				default:
 					$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Unsupported function "%s"', $function), 0);
 			}
-			
-			
 		}
 
 		$this->SendDebug(IPS_GetName($this->InstanceID), 'Invalid data received from parent', 0);
