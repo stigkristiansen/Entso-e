@@ -154,7 +154,7 @@ class DayAheadPrices extends IPSModule {
 		
 		$reportedCurrency = $data->Prices->Currency;
 
-		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Prices is reported in %s', $reportedCurrency), 0);
+		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Prices from Entso-e are reported in %s', $reportedCurrency), 0);
 		if($this->ReadPropertyString('EntsoECurrency')!=$this->ReadPropertyString('ReportCurrency')) {
 			$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('1 %s is %s %S', $this->ReadPropertyString('EntsoECurrency'), (string)$rate, $this->ReadPropertyString('ReportCurrency')), 0);
 		}
@@ -169,6 +169,7 @@ class DayAheadPrices extends IPSModule {
 			return;
 		}
 
+		$this->SendDebug(IPS_GetName($this->InstanceID), 'Updating variables...', 0);
 		$this->SetValue('Current', $stats->current/$divider*$rate);
 		$this->SetValue('High', $stats->high/$divider*$rate);
 		$this->SetValue('Low', $stats->low/$divider*$rate);

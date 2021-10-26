@@ -6,7 +6,7 @@
         },
         {  "type":"Label", "caption":"Day-Ahead Prices"},
         {
-            "type":"Select", "name":"EntsoECurrency", "caption":"Entso-e Currency" , 
+            "type":"Select", "name":"EntsoECurrency", "caption":"Entso-e reports in the followinbg currency" , 
             "options":[ 
                 {"caption":"EUR", "value":"EUR"}, 
                 {"caption":"NOK", "value":"NOK"}, 
@@ -15,7 +15,7 @@
             ] 
         },
         {
-            "type":"Select", "name":"ReportCurrency", "caption":"Report Currency" , 
+            "type":"Select", "name":"ReportCurrency", "caption":"Variables are reported in the following currency" , 
             "options":[ 
                 {"caption":"EUR", "value":"EUR"}, 
                 {"caption":"NOK", "value":"NOK"}, 
@@ -30,7 +30,17 @@
                 {"caption":"NO2", "value":"10YNO-2--------T"}, 
                 {"caption":"NO3", "value":"10YNO-3--------J"}, 
                 {"caption":"NO4", "value":"10YNO-4--------9"}, 
-                {"caption":"NO5", "value":"10Y1001A1001A48H"} 
+                {"caption":"NO5", "value":"10Y1001A1001A48H"},
+                {"caption":"SE1", "value":"10Y1001A1001A44P"},  
+                {"caption":"SE2", "value":"10Y1001A1001A45N"},
+                {"caption":"SE3", "value":"10Y1001A1001A46L"},
+                {"caption":"SE4", "value":"10Y1001A1001A47J"},
+                {"caption":"FI", "value":"10YFI-1--------U"},
+                {"caption":"DK1", "value":"10YDK-1--------W"},
+                {"caption":"DE_LU", "value":"10Y1001A1001A82H"},
+                {"caption":"NL", "value":"10YNL----------L"},
+                {"caption":"BE", "value":"10YBE----------2"},
+                {"caption":"GB", "value":"10YGB----------A"}
             ] 
         }
     ],
