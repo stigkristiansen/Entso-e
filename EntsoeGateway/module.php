@@ -8,7 +8,7 @@ class EntsoeGateway extends IPSModule {
 	use WebCall;
 
 	const RATES_BASE_URL = 'http://api.exchangeratesapi.io/v1/latest';
-	const DAY_AHEAD_BASE_URL = '';
+	const DAY_AHEAD_BASE_URL = 'https://transparency.entsoe.eu/api';
 
 	public function Create() {
 		//Never delete this line!
@@ -100,14 +100,58 @@ class EntsoeGateway extends IPSModule {
 			throw new Exception('Missing API key for Entso-e');
 		}
 
-		// Call API
+		$midnight = new DateTime('today midnight');
+		$midnight->setTimezone(new DateTimeZone("UTC")); 
+		$periodStart = $midnight->format('YmdHi');
+		$midnight->add(new DateInterval('PT24H'));
+		$periodEnd = $midnight->format('YmdHi');
+
+		$zone = '10YNO-1--------2';
+		$params = array('securityToken' => $apiKey);
+		$params['in_Domain'] = $zone;
+		$params['out_Domain'] = $zone;
+		$params['periodStart'] = $periodStart;
+		$params['periodEnd'] = $periodEnd;
+		$params['documentType'] = 'A44'
+
+		$result = $this->Request('get', self::DAY_AHEAD_BASE_URL, $params);
+
+		if($result->success==false) {
+			throw new Exception(sprintf('Failed to call Entso-e. The error was %s:%s', (string)$result->httpcode, $result->errortext));
+		}
+
+		$xml = simplexml_load_string($result->result);
+
+		if(!isset($xml->{"TimeSeries"}->{"currency_Unit.name"})) {
+			throw new Exception('Failed to call Entso-e. Invalid data, missing "TimeSeries"');
+		}
 		
+		if(!isset($xml->{"TimeSeries"}->{"price_Measure_Unit.name"})) {
+			throw new Exception('Failed to call Entso-e. Invalid data, missing "price_Measure_Unit.name"');
+		}
+		
+		if!(isset($xml->{"TimeSeries"}->{"Period"}->{"Point"})) {
+			throw new Exception('Failed to call Entso-e. Invalid data, missing "Point"');
+		}
+
+		$currency = (string)$xml->{"TimeSeries"}->{"currency_Unit.name"};
+		$priceMeasureUnitName = (string)$xml->{"TimeSeries"}->{"price_Measure_Unit.name"};
+		
+		$points = [];
+		foreach($xml->{"TimeSeries"}->{"Period"}->{"Point"} as $point) {
+			$points[] = (float)((string)$point->{"price.amount"});
+		}    
+		   
+		$series = array('Currency' => $currency);
+		$series['MeasureUnit'] = $priceMeasureUnitName;
+		$series['Points'] = $points;
+	
+
 		$return = array('Function' => 'GetDayAheadPrices');
 		$return['RequestId'] = $RequestId;
-		//$return['Result'] = $result->result;
-		$return['Result'] = '{"Prices":"None"}';
+		$return['Result'] = $series;
 		
-		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Returning day-Ahead Prices to requesting child with Ident %s. Result sent is %s...',  $ChildId, $return), 0);
+		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Returning day-Ahead Prices to requesting child with Ident %s. Result sent is %s...',  $ChildId, json_encode($return)), 0);
 		$this->SendDataToChildren(json_encode(["DataID" => "{6E413DE8-C9F0-5E7F-4A69-07993C271FDC}", "ChildId" => $ChildId, "RequestId" => $RequestId,"Buffer" => $return]));
 	}
 
