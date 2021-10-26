@@ -14,19 +14,21 @@ class DayAheadPrices extends IPSModule {
 
 		$this->ConnectParent('{751B2290-5D65-1759-A970-5B7CA5CAAA7A}');
 
-		$this->RegisterPropertyString('Area', 'NO1');
+		$this->RegisterPropertyString('Area', '10YNO-1--------2');
+		$this->RegisterPropertyString('EntsoECurrency', 'EUR');
+		$this->RegisterPropertyString('ReportCurrency', 'NOK');
 
 		$this->RegisterAttributeString('Prices', '');
 		$this->RegisterAttributeString('Rates', '');
 		
-		$this->RegisterProfileFloat('ESEDA.Price', 'Dollar', '', ' kr/kWt', 4);
+		$this->RegisterProfileFloat('ESEDA.Price', 'Dollar', '', ' price/kWt', 4);
 
 		$this->RegisterTimer('EntoseDayAheadRefresh' . (string)$this->InstanceID, 0, 'IPS_RequestAction(' . (string)$this->InstanceID . ', "Refresh", 0);'); 
 
-		$this->RegisterVariableFloat('Current', 'Aktuell', 'ESEDA.Price', 1);
-		$this->RegisterVariableFloat('Low', 'Lavest', 'ESEDA.Price', 2);
-		$this->RegisterVariableFloat('High', 'Høyest', 'ESEDA.Price', 3);
-		$this->RegisterVariableFloat('Avg', 'Gjennomsnitt', 'ESEDA.Price', 4);
+		$this->RegisterVariableFloat('Current', 'Current', 'ESEDA.Price', 1);
+		$this->RegisterVariableFloat('Low', 'Low', 'ESEDA.Price', 2);
+		$this->RegisterVariableFloat('High', 'High', 'ESEDA.Price', 3);
+		$this->RegisterVariableFloat('Avg', 'Average', 'ESEDA.Price', 4);
 		$this->RegisterVariableFloat('Median', 'Median', 'ESEDA.Price', 5);
 
 		$this->RegisterMessage(0, IPS_KERNELMESSAGE);
@@ -92,10 +94,12 @@ class DayAheadPrices extends IPSModule {
 		$request = [];
 		
 		if($Rates) {
-			$request[] = ['Function'=>'GetExchangeRates', 'RequestId'=>$guid, 'ChildId'=>(string)$this->InstanceID];
+			$currency = $this->ReadPropertyString('EntsoECurrency');
+			$request[] = ['Function'=>'GetExchangeRates', 'RequestId'=>$guid, 'ChildId'=>(string)$this->InstanceID, , 'Currency'=>$currency];
 		}
 		if($Prices) {
-			$request[] = ['Function'=>'GetDayAheadPrices', 'RequestId'=>$guid, 'ChildId'=>(string)$this->InstanceID];
+			$area = $this->ReadPropertyString('Area');
+			$request[] = ['Function'=>'GetDayAheadPrices', 'RequestId'=>$guid, 'ChildId'=>(string)$this->InstanceID, 'Area'=>$area];
 		}
 
 		if(count($request)>0) {

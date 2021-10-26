@@ -81,10 +81,18 @@ class EntsoeGateway extends IPSModule {
 			
 			switch($function) {
 				case 'getdayaheadprices':
-					$this->GetDayAheadPrices($childId, $requestId);
+					if(!isset($request->Area)) {
+						throw new Exception(sprintf('HandleAsyncRequest: Invalid formated request. Key "Area" is missing. The request was "%s"', $request));
+					}
+					
+					$this->GetDayAheadPrices($request->Area, $childId, $requestId);
 					break;
 				case 'getexchangerates':
-					$this->GetExchangeRates($childId, $requestId);
+					if(!isset($request->Currency)) {
+						throw new Exception(sprintf('HandleAsyncRequest: Invalid formated request. Key "Currency" is missing. The request was "%s"', $request));
+					}		
+
+					$this->GetExchangeRates($request->Currency, $childId, $requestId);
 					break;
 				default:
 					throw new Exception(sprintf('HandleAsyncRequest failed. Unknown function "%s"', $function));
@@ -92,7 +100,7 @@ class EntsoeGateway extends IPSModule {
 		}
 	}
 
-	private function GetDayAheadPrices(string $ChildId, string $RequestId) {
+	private function GetDayAheadPrices(string $Area, string $ChildId, string $RequestId) {
 		$this->SendDebug(IPS_GetName($this->InstanceID), 'Requesting Day-Ahead prices....', 0);
 
 		$apiKey = $this->ReadPropertyString('ApiKey');
@@ -106,7 +114,7 @@ class EntsoeGateway extends IPSModule {
 		$midnight->add(new DateInterval('PT24H'));
 		$periodEnd = $midnight->format('YmdHi');
 
-		$zone = '10YNO-1--------2';
+		$zone = $Area;
 		$params = array('securityToken' => $apiKey);
 		$params['in_Domain'] = $zone;
 		$params['out_Domain'] = $zone;
@@ -155,7 +163,7 @@ class EntsoeGateway extends IPSModule {
 		$this->SendDataToChildren(json_encode(["DataID" => "{6E413DE8-C9F0-5E7F-4A69-07993C271FDC}", "ChildId" => $ChildId, "RequestId" => $RequestId,"Buffer" => $return]));
 	}
 
-	private function GetExchangeRates(string $ChildId, string $RequestId) {
+	private function GetExchangeRates(string $Currency, string $ChildId, string $RequestId) {
 		$this->SendDebug(IPS_GetName($this->InstanceID), 'Requesting Exchange rate....', 0);
 
 		$apiKey = $this->ReadPropertyString('RatesApiKey');
@@ -164,7 +172,7 @@ class EntsoeGateway extends IPSModule {
 		}
 
 		$params = array('access_key' => $apiKey);
-		$params['base'] = 'EUR';
+		$params['base'] = $Currency;
 		$params['symbols'] = 'NOK,SEK,DKK';
 
 		$result = $this->Request('get', self::RATES_BASE_URL, $params);
