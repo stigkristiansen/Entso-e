@@ -130,7 +130,7 @@ class EntsoeGateway extends IPSModule {
 			throw new Exception('Failed to call Entso-e. Invalid data, missing "price_Measure_Unit.name"');
 		}
 		
-		if!(isset($xml->{"TimeSeries"}->{"Period"}->{"Point"})) {
+		if(!isset($xml->{"TimeSeries"}->{"Period"}->{"Point"})) {
 			throw new Exception('Failed to call Entso-e. Invalid data, missing "Point"');
 		}
 
