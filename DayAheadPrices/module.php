@@ -137,15 +137,37 @@ class DayAheadPrices extends IPSModule {
 				break;
 		}
 
-		$rate = $rates->Rates->rates->NOK;
-		//$divider = ($data->Prices->MeasureUnit=='MWH'?1000:($data->Prices->MeasureUnit=='GWH'?1000000:1));
+		switch($this->ReadPropertyString('ReportCurrency')) {
+			case 'NOK':
+				$rate = $rates->Rates->rates->NOK;
+				break;
+			case $this->ReadPropertyString('EntsoECurrency'):
+				$rate = 1;
+				break;
+			case 'SEK':
+				$rate = $rates->Rates->rates->SEK;
+				break;
+			case 'DKK'
+				$rate = $rates->Rates->rates->DKK;
+				break;
+		}
+		
 		$reportedCurrency = $data->Prices->Currency;
 
-		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Prices is reprted in %s', $reportedCurrency), 0);
-		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('1 EUR is %s NOK', (string)$rate), 0);
+		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Prices is reported in %s', $reportedCurrency), 0);
+		if($this->ReadPropertyString('EntsoECurrency')!=$this->ReadPropertyString('ReportCurrency')) {
+			$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('1 %s is %s %S', $this->ReadPropertyString('EntsoECurrency'), (string)$rate, $this->ReadPropertyString('ReportCurrency')), 0);
+		}
 		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Divider is: %s', (string)$divider), 0);
 		
 		$stats = $this->GetStats($data->Prices->Points);
+
+		if($reportedCurrency!=$this->ReadPropertyString('EntsoECurrency')) {
+			$this->LogMessage(sprintf('There is a mismatch between Entso-e configured currency (%s )and received currency (%s). Please reconfigure!', this->ReadPropertyString('EntsoECurrency'), $reportedCurrency), KL_ERROR);
+			$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('There is a mismatch between Entso-e configured currency (%s )and received currency (%s). Please reconfigure!', this->ReadPropertyString('EntsoECurrency'), $reportedCurrency), 0);
+
+			return;
+		}
 
 		$this->SetValue('Current', $stats->current/$divider*$rate);
 		$this->SetValue('High', $stats->high/$divider*$rate);
