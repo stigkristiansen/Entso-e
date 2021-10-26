@@ -95,7 +95,7 @@ class DayAheadPrices extends IPSModule {
 		
 		if($Rates) {
 			$currency = $this->ReadPropertyString('EntsoECurrency');
-			$request[] = ['Function'=>'GetExchangeRates', 'RequestId'=>$guid, 'ChildId'=>(string)$this->InstanceID, , 'Currency'=>$currency];
+			$request[] = ['Function'=>'GetExchangeRates', 'RequestId'=>$guid, 'ChildId'=>(string)$this->InstanceID, 'Currency'=>$currency];
 		}
 		if($Prices) {
 			$area = $this->ReadPropertyString('Area');
