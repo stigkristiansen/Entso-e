@@ -194,14 +194,15 @@ class DayAheadPrices extends IPSModule {
 				case 'getexchangerates':
 					$rates = $data->Buffer->Result;
 					$this->UpdateRates($rates);
-					break;
+					return;
 				case 'getdayaheadprices':
 					$prices = $data->Buffer->Result;
 					$this->UpdatePrices($prices);
 					$this->UpdateVariables();
-					break;
+					return;
 				default:
 					$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Unsupported function "%s"', $function), 0);
+					return;
 			}
 		}
 
