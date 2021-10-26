@@ -120,7 +120,7 @@ class DayAheadPrices extends IPSModule {
 
 		$rate = $rates->Rates->rates->NOK;
 		$stats = $this->GetStats($data->Prices->Points);
-		$divider = $data->Prices->MeasureUnit=='MWH'?1000:$data->Prices->MeasureUnit=='GWH'?1000000:1;
+		$divider = ($data->Prices->MeasureUnit=='MWH'?1000:($data->Prices->MeasureUnit=='GWH'?1000000:1));
 		$reportedCurrency = $data->Prices->Currency;
 
 		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Prices is reprted in %s', $reportedCurrency), 0);
