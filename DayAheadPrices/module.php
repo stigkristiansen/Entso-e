@@ -164,7 +164,7 @@ class DayAheadPrices extends IPSModule {
 
 		if($reportedCurrency!=$this->ReadPropertyString('EntsoECurrency')) {
 			$this->LogMessage(sprintf('There is a mismatch between Entso-e configured currency (%s )and received currency (%s). Please reconfigure!', $this->ReadPropertyString('EntsoECurrency'), $reportedCurrency), KL_ERROR);
-			$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('There is a mismatch between Entso-e configured currency (%s )and received currency (%s). Please reconfigure!', this->ReadPropertyString('EntsoECurrency'), $reportedCurrency), 0);
+			$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('There is a mismatch between Entso-e configured currency (%s )and received currency (%s). Please reconfigure!', $this->ReadPropertyString('EntsoECurrency'), $reportedCurrency), 0);
 
 			return;
 		}
