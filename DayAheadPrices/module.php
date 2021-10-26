@@ -140,11 +140,15 @@ class DayAheadPrices extends IPSModule {
 		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Prices is reprted in %s', $reportedCurrency), 0);
 		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('1 EUR is %s NOK', (string)$rate), 0);
 		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Divider is: %s', (string)$divider), 0);
+		
 		$stats = $this->GetStats($data->Prices->Points);
-		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Calculated statistics: %s', json_encode($stats)), 0);
 
-
-
+		$this->SetValue('Current', $stats->current/$divider*$rate);
+		$this->SetValue('High', $stats->high/$divider*$rate);
+		$this->SetValue('Low', $stats->low/$divider*$rate);
+		$this->SetValue('Avg', $stats->avg/$divider*$rate);
+		$this->SetValue('Median', $stats->median/$divider*$rate);
+		
 	}
 
 	private function EvaluateAttribute(string $Name) {
