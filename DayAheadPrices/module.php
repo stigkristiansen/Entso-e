@@ -120,15 +120,13 @@ class DayAheadPrices extends IPSModule {
 
 		$rate = $rates->Rates->rates->NOK;
 		$stats = $this->GetStats($data->Prices->Points);
-		$divider = $data-Prices->MeasureUnit=='MWH'?1000:$data-Prices->MeasureUnit=='GWH'?1000000:1;
-		$reportedCurrency = $data-Prices->Currency;
+		$divider = $data->Prices->MeasureUnit=='MWH'?1000:$data->Prices->MeasureUnit=='GWH'?1000000:1;
+		$reportedCurrency = $data->Prices->Currency;
 
 		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Prices is reprted in %s', $reportedCurrency), 0);
 		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('1 EUR is %s NOK', (string)$rate), 0);
 		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Divider is: %s', (string)$divider), 0);
 		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Calculated statistics: %s', json_encode($stats)), 0);
-		
-
 
 	}
 
