@@ -84,7 +84,7 @@ class EntsoeGateway extends IPSModule {
 					if(!isset($request->Area)) {
 						throw new Exception(sprintf('HandleAsyncRequest: Invalid formated request. Key "Area" is missing. The request was "%s"', $request));
 					}
-					
+
 					$this->GetDayAheadPrices($request->Area, $childId, $requestId);
 					break;
 				case 'getexchangerates':
@@ -154,16 +154,16 @@ class EntsoeGateway extends IPSModule {
 		$series['MeasureUnit'] = $priceMeasureUnitName;
 		$series['Points'] = $points;
 	
-
 		$return = array('Function' => 'GetDayAheadPrices');
 		$return['RequestId'] = $RequestId;
-		$return['Result'] = $series;
+		$return['Prices'] = $series;
+		$return['Rates'] = $this->GetExchangeRates($currency);
 		
 		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Returning day-Ahead Prices to requesting child with Ident %s. Result sent is %s...',  $ChildId, json_encode($return)), 0);
 		$this->SendDataToChildren(json_encode(["DataID" => "{6E413DE8-C9F0-5E7F-4A69-07993C271FDC}", "ChildId" => $ChildId, "RequestId" => $RequestId,"Buffer" => $return]));
 	}
 
-	private function GetExchangeRates(string $Currency, string $ChildId, string $RequestId) {
+	private function GetExchangeRates(string $Currency) { //, string $ChildId, string $RequestId) {
 		$this->SendDebug(IPS_GetName($this->InstanceID), 'Requesting Exchange rate....', 0);
 
 		$apiKey = $this->ReadPropertyString('RatesApiKey');
@@ -173,7 +173,7 @@ class EntsoeGateway extends IPSModule {
 
 		$params = array('access_key' => $apiKey);
 		$params['base'] = $Currency;
-		$params['symbols'] = 'NOK,SEK,DKK';
+		$params['symbols'] = 'NOK,SEK,DKK,EUR';
 
 		$result = $this->Request('get', self::RATES_BASE_URL, $params);
 
@@ -189,11 +189,13 @@ class EntsoeGateway extends IPSModule {
 			throw new Exception(sprintf('Call to Exchangerates.io failed.The error was %s:%s',$result->result->error->code, $result->result->error->info));
 		}
 
+		return $result->result;
+
 		$return = array('Function' => 'GetExchangeRates');
 		$return['RequestId'] = $RequestId;
 		$return['Result'] = $result->result;
 		
 		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Returning Exchange rates to requesting child with Ident %s. Result sent is %s...',  $ChildId, json_encode($return)), 0);
-		$this->SendDataToChildren(json_encode(["DataID" => "{6E413DE8-C9F0-5E7F-4A69-07993C271FDC}", "ChildId" => $ChildId, "Buffer" => $return]));
+		//$this->SendDataToChildren(json_encode(["DataID" => "{6E413DE8-C9F0-5E7F-4A69-07993C271FDC}", "ChildId" => $ChildId, "Buffer" => $return]));
 	}
 }

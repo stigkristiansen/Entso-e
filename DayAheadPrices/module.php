@@ -93,10 +93,10 @@ class DayAheadPrices extends IPSModule {
 		$guid = self::GUID();
 		$request = [];
 		
-		if($Rates) {
-			$currency = $this->ReadPropertyString('EntsoECurrency');
-			$request[] = ['Function'=>'GetExchangeRates', 'RequestId'=>$guid, 'ChildId'=>(string)$this->InstanceID, 'Currency'=>$currency];
-		}
+		//if($Rates) {
+		//	$currency = $this->ReadPropertyString('EntsoECurrency');
+		//	$request[] = ['Function'=>'GetExchangeRates', 'RequestId'=>$guid, 'ChildId'=>(string)$this->InstanceID, 'Currency'=>$currency];
+		//}
 		if($Prices) {
 			$area = $this->ReadPropertyString('Area');
 			$request[] = ['Function'=>'GetDayAheadPrices', 'RequestId'=>$guid, 'ChildId'=>(string)$this->InstanceID, 'Area'=>$area];
@@ -108,10 +108,11 @@ class DayAheadPrices extends IPSModule {
 	}
 
 	private function HandleData() {
-		$fetchPrices = $this->EvaluateAttribute('Prices');
-		$fetchRates  = $this->EvaluateAttribute('Rates');
+		//$fetchPrices = $this->EvaluateAttribute('Prices');
+		//$fetchRates  = $this->EvaluateAttribute('Rates');
 
-		if($fetchPrices||$fetchRates) {
+		//if($fetchPrices||$fetchRates) {
+		if($this->EvaluateAttribute('Prices')) {
 			$this->RequestData($fetchRates, $fetchPrices);
 		} else {
 			$this->UpdateVariables();
@@ -119,8 +120,8 @@ class DayAheadPrices extends IPSModule {
 	}
 
 	private function UpdateVariables() {
-		$data = json_decode($this->ReadAttributeString('Prices'));
-		$rates =  json_decode($this->ReadAttributeString('Rates'));
+		$data = json_decode($this->ReadAttributeString('Prices'))->Prices;
+		$rates =  json_decode($this->ReadAttributeString('Rates'))->Rates;
 
 		switch(strtolower($data->Prices->MeasureUnit)) {
 			case 'wh':
@@ -141,8 +142,8 @@ class DayAheadPrices extends IPSModule {
 			case 'NOK':
 				$rate = $rates->Rates->rates->NOK;
 				break;
-			case $this->ReadPropertyString('EntsoECurrency'):
-				$rate = 1;
+			case 'EUR':
+				$rate = $rates->Rates->rates->EUR;
 				break;
 			case 'SEK':
 				$rate = $rates->Rates->rates->SEK;
@@ -152,23 +153,23 @@ class DayAheadPrices extends IPSModule {
 				break;
 		}
 		
-		$reportedCurrency = $data->Prices->Currency;
-
-		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Prices from Entso-e are reported in %s', $reportedCurrency), 0);
-		if($this->ReadPropertyString('EntsoECurrency')!=$this->ReadPropertyString('ReportCurrency')) {
-			$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('1 %s is %s %s', $this->ReadPropertyString('EntsoECurrency'), (string)$rate, $this->ReadPropertyString('ReportCurrency')), 0);
-		}
-		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Variables show prices in %s', $this->ReadPropertyString('ReportCurrency')), 0);
-		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Divider is: %s', (string)$divider), 0);
-		
-		$stats = $this->GetStats($data->Prices->Points);
-
-		if($reportedCurrency!=$this->ReadPropertyString('EntsoECurrency')) {
-			$this->LogMessage(sprintf('There is a mismatch between Entso-e configured currency (%s )and received currency (%s). Please reconfigure!', $this->ReadPropertyString('EntsoECurrency'), $reportedCurrency), KL_ERROR);
-			$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('There is a mismatch between Entso-e configured currency (%s )and received currency (%s). Please reconfigure!', $this->ReadPropertyString('EntsoECurrency'), $reportedCurrency), 0);
+		$entsoeCurrency = $data->Prices->Currency;
+		/*if($entsoeCurrency!=$this->ReadPropertyString('EntsoECurrency')) {
+			$this->LogMessage(sprintf('There is a mismatch between Entso-e configured currency (%s )and received currency (%s). Please reconfigure!', $this->ReadPropertyString('EntsoECurrency'), $entsoeCurrency), KL_ERROR);
+			$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('There is a mismatch between Entso-e configured currency (%s )and received currency (%s). Please reconfigure!', $this->ReadPropertyString('EntsoECurrency'), $entsoeCurrency), 0);
 
 			return;
 		}
+*/
+		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Prices from Entso-e are reported in %s', $reportedCurrency), 0);
+		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Variables show prices in %s', $this->ReadPropertyString('ReportCurrency')), 0);
+		//if($this->ReadPropertyString('EntsoECurrency')!=$this->ReadPropertyString('ReportCurrency')) {
+		if($entsoeCurrency!=$this->ReadPropertyString('ReportCurrency')) {
+			$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('1 %s is %s %s', $this->ReadPropertyString('EntsoECurrency'), (string)$rate, $this->ReadPropertyString('ReportCurrency')), 0);
+		}
+		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Divider is: %s', (string)$divider), 0);
+		
+		$stats = $this->GetStats($data->Prices->Points);
 
 		$this->SendDebug(IPS_GetName($this->InstanceID), 'Updating variables...', 0);
 		$this->SetValue('Current', $stats->current/$divider*$rate);
@@ -220,8 +221,10 @@ class DayAheadPrices extends IPSModule {
 					$this->UpdateRates($rates);
 					return;
 				case 'getdayaheadprices':
-					$prices = $data->Buffer->Result;
+					$prices = $data->Buffer->Prices;
+					$rates = $data->Buffer->Rates;
 					$this->UpdatePrices($prices);
+					$this->UpdateRates($rates);
 					$this->UpdateVariables();
 					return;
 				default:
