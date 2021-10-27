@@ -15,7 +15,6 @@ class DayAheadPrices extends IPSModule {
 		$this->ConnectParent('{751B2290-5D65-1759-A970-5B7CA5CAAA7A}');
 
 		$this->RegisterPropertyString('Area', '10YNO-1--------2');
-		$this->RegisterPropertyString('EntsoECurrency', 'EUR');
 		$this->RegisterPropertyString('ReportCurrency', 'NOK');
 
 		$this->RegisterAttributeString('Prices', '');
@@ -49,8 +48,22 @@ class DayAheadPrices extends IPSModule {
 		parent::ApplyChanges();
 
 		$this->SetReceiveDataFilter('.*"ChildId":"' . (string)$this->InstanceID .'".*');
-		
 
+		switch($this->ReadPropertyString('ReportCurrency')) {
+			case 'NOK':
+			case 'SEK':
+			case 'DKK':
+				$profileSuffix = 'kr/kWh';
+				break;
+			case 'EUR':
+				$profileSuffix = '€/kWh';
+				break;
+			default:
+				$profileSuffix = 'price/kWh';
+		}
+		
+		IPS_SetVariableProfileText(('ESEDA.Price', '', $profileSuffix);
+		
 		if (IPS_GetKernelRunlevel() == KR_READY) {
 			$this->InitTimer();
 		}
@@ -89,23 +102,14 @@ class DayAheadPrices extends IPSModule {
 		$this->HandleData();
 	}
 
-	//private function RequestData(bool $Rates, bool $Prices) {
 	private function RequestData() {
 		$guid = self::GUID();
 		$request = [];
-		
-		//if($Rates) {
-		//	$currency = $this->ReadPropertyString('EntsoECurrency');
-		//	$request[] = ['Function'=>'GetExchangeRates', 'RequestId'=>$guid, 'ChildId'=>(string)$this->InstanceID, 'Currency'=>$currency];
-		//}
-		//if($Prices) {
-			$area = $this->ReadPropertyString('Area');
-			$request[] = ['Function'=>'GetDayAheadPrices', 'RequestId'=>$guid, 'ChildId'=>(string)$this->InstanceID, 'Area'=>$area];
-		//}
-
-		//if(count($request)>0) {
-			$this->SendDataToParent(json_encode(['DataID' => '{8ED8DB86-AFE5-57AD-D638-505C91A39397}', 'Buffer' => $request]));
-		//}
+	
+		$area = $this->ReadPropertyString('Area');
+		$request[] = ['Function'=>'GetDayAheadPrices', 'RequestId'=>$guid, 'ChildId'=>(string)$this->InstanceID, 'Area'=>$area];
+	
+		$this->SendDataToParent(json_encode(['DataID' => '{8ED8DB86-AFE5-57AD-D638-505C91A39397}', 'Buffer' => $request]));
 	}
 
 	private function HandleData() {
@@ -113,8 +117,6 @@ class DayAheadPrices extends IPSModule {
 		$fetchRates  = $this->EvaluateAttribute('Rates');
 
 		if($fetchPrices||$fetchRates) {
-		//if($this->EvaluateAttribute('Prices')) {
-			//$this->RequestData($fetchRates, $fetchPrices);
 			$this->RequestData();
 		} else {
 			$this->UpdateVariables();
@@ -156,20 +158,14 @@ class DayAheadPrices extends IPSModule {
 		}
 		
 		$entsoeCurrency = $data->Prices->Currency;
-		/*if($entsoeCurrency!=$this->ReadPropertyString('EntsoECurrency')) {
-			$this->LogMessage(sprintf('There is a mismatch between Entso-e configured currency (%s )and received currency (%s). Please reconfigure!', $this->ReadPropertyString('EntsoECurrency'), $entsoeCurrency), KL_ERROR);
-			$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('There is a mismatch between Entso-e configured currency (%s )and received currency (%s). Please reconfigure!', $this->ReadPropertyString('EntsoECurrency'), $entsoeCurrency), 0);
-
-			return;
-		}
-		*/
-
 		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Prices from Entso-e are reported in %s', $entsoeCurrency), 0);
+		
 		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Variables show prices in %s', $this->ReadPropertyString('ReportCurrency')), 0);
-		//if($this->ReadPropertyString('EntsoECurrency')!=$this->ReadPropertyString('ReportCurrency')) {
+		
 		if($entsoeCurrency!=$this->ReadPropertyString('ReportCurrency')) {
 			$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('1 %s is %s %s', $this->ReadPropertyString('EntsoECurrency'), (string)$rate, $this->ReadPropertyString('ReportCurrency')), 0);
 		}
+		
 		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Divider is: %s', (string)$divider), 0);
 		
 		$stats = $this->GetStats($data->Prices->Points);
@@ -219,10 +215,6 @@ class DayAheadPrices extends IPSModule {
 		if(isset($data->Buffer->Function)) {
 			$function = strtolower($data->Buffer->Function);
 			switch($function) {
-				case 'getexchangerates':
-					$rates = $data->Buffer->Result;
-					$this->UpdateRates($rates);
-					return;
 				case 'getdayaheadprices':
 					$prices = $data->Buffer->Prices;
 					$rates = $data->Buffer->Rates;

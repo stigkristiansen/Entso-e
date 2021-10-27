@@ -68,11 +68,11 @@ class EntsoeGateway extends IPSModule {
 		foreach($requests as $request) {
 		
 			if(!isset($request->Function)||!isset($request->ChildId)) {
-				throw new Exception(sprintf('HandleAsyncRequest: Invalid formated request. Key "Function" and/or "ChildId" is missing. The request was "%s"', $request));
+				throw new Exception(sprintf('Incoming request is invalid. Key "Function" and/or "ChildId" is missing. The request was "%s"', $request));
 			}
 			
 			if(!isset($request->RequestId)) {
-				throw new Exception(sprintf('HandleAsyncRequest: Invalid formated request. Key "RequestId" is missing. The request was "%s"', $request));
+				throw new Exception(sprintf('Incoming request is invalid. Key "RequestId" is missing. The request was "%s"', $request));
 			}
 
 			$function = strtolower($request->Function);
@@ -82,20 +82,13 @@ class EntsoeGateway extends IPSModule {
 			switch($function) {
 				case 'getdayaheadprices':
 					if(!isset($request->Area)) {
-						throw new Exception(sprintf('HandleAsyncRequest: Invalid formated request. Key "Area" is missing. The request was "%s"', $request));
+						throw new Exception(sprintf('Incoming request is invalid. Key "Area" is missing. The request was "%s"', $request));
 					}
 
 					$this->GetDayAheadPrices($request->Area, $childId, $requestId);
 					break;
-				case 'getexchangerates':
-					if(!isset($request->Currency)) {
-						throw new Exception(sprintf('HandleAsyncRequest: Invalid formated request. Key "Currency" is missing. The request was "%s"', $request));
-					}		
-
-					$this->GetExchangeRates($request->Currency, $childId, $requestId);
-					break;
 				default:
-					throw new Exception(sprintf('HandleAsyncRequest failed. Unknown function "%s"', $function));
+					throw new Exception(sprintf('Incoming request failed. Unknown function "%s"', $function));
 			}
 		}
 	}
@@ -163,7 +156,7 @@ class EntsoeGateway extends IPSModule {
 		$this->SendDataToChildren(json_encode(["DataID" => "{6E413DE8-C9F0-5E7F-4A69-07993C271FDC}", "ChildId" => $ChildId, "RequestId" => $RequestId,"Buffer" => $return]));
 	}
 
-	private function GetExchangeRates(string $Currency) { //, string $ChildId, string $RequestId) {
+	private function GetExchangeRates(string $Currency) { 
 		$this->SendDebug(IPS_GetName($this->InstanceID), 'Requesting Exchange rate....', 0);
 
 		$apiKey = $this->ReadPropertyString('RatesApiKey');
@@ -190,12 +183,5 @@ class EntsoeGateway extends IPSModule {
 		}
 
 		return $result->result;
-
-		$return = array('Function' => 'GetExchangeRates');
-		$return['RequestId'] = $RequestId;
-		$return['Result'] = $result->result;
-		
-		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Returning Exchange rates to requesting child with Ident %s. Result sent is %s...',  $ChildId, json_encode($return)), 0);
-		//$this->SendDataToChildren(json_encode(["DataID" => "{6E413DE8-C9F0-5E7F-4A69-07993C271FDC}", "ChildId" => $ChildId, "Buffer" => $return]));
 	}
 }
