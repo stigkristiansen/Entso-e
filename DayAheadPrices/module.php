@@ -20,7 +20,7 @@ class DayAheadPrices extends IPSModule {
 		$this->RegisterAttributeString('Prices', '');
 		$this->RegisterAttributeString('Rates', '');
 		
-		$this->RegisterProfileFloat('ESEDA.Price', 'Dollar', '', ' price/kWt', 4);
+		$this->RegisterProfileFloat('ESEDA.Price', 'Dollar', '', ' price/kWt', 2);
 
 		$this->RegisterTimer('EntoseDayAheadRefresh' . (string)$this->InstanceID, 0, 'IPS_RequestAction(' . (string)$this->InstanceID . ', "Refresh", 0);'); 
 
