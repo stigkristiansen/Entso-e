@@ -131,11 +131,17 @@ class EntsoEGateway extends IPSModule {
 		if(!isset($xml->{"TimeSeries"}->{"price_Measure_Unit.name"})) {
 			throw new Exception('Failed to call Entso-e. Invalid data, missing "price_Measure_Unit.name"');
 		}
+
+		if(!isset($xml->{"TimeSeries"}->{"Period"}->{"resolution"})) {
+			throw new Exception('Failed to call Entso-e. Invalid data, missing "resolution"');
+		}
 		
 		if(!isset($xml->{"TimeSeries"}->{"Period"}->{"Point"})) {
 			throw new Exception('Failed to call Entso-e. Invalid data, missing "Point"');
 		}
 
+
+		$resolution = (string)$xml->{"TimeSeries"}->{"Period"}->{"resolution"};
 		$currency = (string)$xml->{"TimeSeries"}->{"currency_Unit.name"};
 		$priceMeasureUnitName = (string)$xml->{"TimeSeries"}->{"price_Measure_Unit.name"};
 		
@@ -146,6 +152,7 @@ class EntsoEGateway extends IPSModule {
 		   
 		$series = array('Currency' => $currency);
 		$series['MeasureUnit'] = $priceMeasureUnitName;
+		$series['Resolution'] = $resolution;
 		$series['Points'] = $points;
 	
 		$return = array('Function' => 'GetDayAheadPrices');
