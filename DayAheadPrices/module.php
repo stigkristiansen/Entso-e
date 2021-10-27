@@ -153,6 +153,7 @@ class DayAheadPrices extends IPSModule {
 				break;
 		}
 		
+		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Debug>: Attribute Prices from Entso-e are %s', json_encode($data)), 0);
 		$entsoeCurrency = $data->Prices->Currency;
 		/*if($entsoeCurrency!=$this->ReadPropertyString('EntsoECurrency')) {
 			$this->LogMessage(sprintf('There is a mismatch between Entso-e configured currency (%s )and received currency (%s). Please reconfigure!', $this->ReadPropertyString('EntsoECurrency'), $entsoeCurrency), KL_ERROR);
@@ -161,7 +162,7 @@ class DayAheadPrices extends IPSModule {
 			return;
 		}
 		*/
-		
+
 		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Prices from Entso-e are reported in %s', $entsoeCurrency), 0);
 		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Variables show prices in %s', $this->ReadPropertyString('ReportCurrency')), 0);
 		//if($this->ReadPropertyString('EntsoECurrency')!=$this->ReadPropertyString('ReportCurrency')) {
