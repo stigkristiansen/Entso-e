@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 include __DIR__ . "/../libs/traits.php";
 
-class EntsoeGateway extends IPSModule {
+class EntsoEGateway extends IPSModule {
 	use WebCall;
 
 	const RATES_BASE_URL = 'http://api.exchangeratesapi.io/v1/latest';

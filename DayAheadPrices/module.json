@@ -1,6 +1,6 @@
 {
     "id": "{848322ED-FF00-6DFF-07AF-9EF143E943A3}",
-    "name": "DayAheadPrices",
+    "name": "Day Ahead Prices",
     "type": 3,
     "vendor": "Entso-e",
     "aliases": ["Day-Ahead Prices"],
