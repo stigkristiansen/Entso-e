@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 include __DIR__ . "/../libs/traits.php";
 
+
 class EntsoEGateway extends IPSModule {
 	use WebCall;
 
