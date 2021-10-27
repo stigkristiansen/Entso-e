@@ -89,7 +89,8 @@ class DayAheadPrices extends IPSModule {
 		$this->HandleData();
 	}
 
-	private function RequestData(bool $Rates, bool $Prices) {
+	//private function RequestData(bool $Rates, bool $Prices) {
+	private function RequestData() {
 		$guid = self::GUID();
 		$request = [];
 		
@@ -97,23 +98,24 @@ class DayAheadPrices extends IPSModule {
 		//	$currency = $this->ReadPropertyString('EntsoECurrency');
 		//	$request[] = ['Function'=>'GetExchangeRates', 'RequestId'=>$guid, 'ChildId'=>(string)$this->InstanceID, 'Currency'=>$currency];
 		//}
-		if($Prices) {
+		//if($Prices) {
 			$area = $this->ReadPropertyString('Area');
 			$request[] = ['Function'=>'GetDayAheadPrices', 'RequestId'=>$guid, 'ChildId'=>(string)$this->InstanceID, 'Area'=>$area];
-		}
+		//}
 
-		if(count($request)>0) {
+		//if(count($request)>0) {
 			$this->SendDataToParent(json_encode(['DataID' => '{8ED8DB86-AFE5-57AD-D638-505C91A39397}', 'Buffer' => $request]));
-		}
+		//}
 	}
 
 	private function HandleData() {
-		//$fetchPrices = $this->EvaluateAttribute('Prices');
-		//$fetchRates  = $this->EvaluateAttribute('Rates');
+		$fetchPrices = $this->EvaluateAttribute('Prices');
+		$fetchRates  = $this->EvaluateAttribute('Rates');
 
-		//if($fetchPrices||$fetchRates) {
-		if($this->EvaluateAttribute('Prices')) {
-			$this->RequestData($fetchRates, $fetchPrices);
+		if($fetchPrices||$fetchRates) {
+		//if($this->EvaluateAttribute('Prices')) {
+			//$this->RequestData($fetchRates, $fetchPrices);
+			$this->RequestData();
 		} else {
 			$this->UpdateVariables();
 		}
@@ -153,7 +155,6 @@ class DayAheadPrices extends IPSModule {
 				break;
 		}
 		
-		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Debug>: Attribute Prices from Entso-e are %s', json_encode($data)), 0);
 		$entsoeCurrency = $data->Prices->Currency;
 		/*if($entsoeCurrency!=$this->ReadPropertyString('EntsoECurrency')) {
 			$this->LogMessage(sprintf('There is a mismatch between Entso-e configured currency (%s )and received currency (%s). Please reconfigure!', $this->ReadPropertyString('EntsoECurrency'), $entsoeCurrency), KL_ERROR);
