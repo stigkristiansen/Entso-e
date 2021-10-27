@@ -62,7 +62,7 @@ class DayAheadPrices extends IPSModule {
 				$profileSuffix = 'price/kWh';
 		}
 		
-		IPS_SetVariableProfileText(('ESEDA.Price', '', $profileSuffix);
+		IPS_SetVariableProfileText('ESEDA.Price', '', $profileSuffix);
 		
 		if (IPS_GetKernelRunlevel() == KR_READY) {
 			$this->InitTimer();
