@@ -53,13 +53,13 @@ class DayAheadPrices extends IPSModule {
 			case 'NOK':
 			case 'SEK':
 			case 'DKK':
-				$profileSuffix = 'kr/kWh';
+				$profileSuffix = ' kr/kWh';
 				break;
 			case 'EUR':
-				$profileSuffix = '€/kWh';
+				$profileSuffix = ' €/kWh';
 				break;
 			default:
-				$profileSuffix = 'price/kWh';
+				$profileSuffix = ' price/kWh';
 		}
 		
 		IPS_SetVariableProfileText('ESEDA.Price', '', $profileSuffix);
