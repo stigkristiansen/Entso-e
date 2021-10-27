@@ -120,8 +120,8 @@ class DayAheadPrices extends IPSModule {
 	}
 
 	private function UpdateVariables() {
-		$data = json_decode($this->ReadAttributeString('Prices'))->Prices;
-		$rates =  json_decode($this->ReadAttributeString('Rates'))->Rates;
+		$data = json_decode($this->ReadAttributeString('Prices'));
+		$rates =  json_decode($this->ReadAttributeString('Rates'));
 
 		switch(strtolower($data->Prices->MeasureUnit)) {
 			case 'wh':
