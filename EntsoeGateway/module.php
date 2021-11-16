@@ -128,7 +128,7 @@ class EntsoEGateway extends IPSModule {
 
 		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('The url is "%s"', $url), 0);
 
-		$this->DownloadURL($url, __DIR__ . '/../../../media/' . $File);
+		$this->DownloadURL($url, urldecode($File));
 
 		$this->SendDebug(IPS_GetName($this->InstanceID), 'The graph was downloaded', 0);
 
