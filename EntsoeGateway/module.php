@@ -67,7 +67,7 @@ class EntsoEGateway extends IPSModule {
 	private function HandleAsyncRequest(string $Requests) {
 		$requests = json_decode($Requests);
 
-		
+
 		try {
 			foreach($requests as $request) {
 			
@@ -128,7 +128,7 @@ class EntsoEGateway extends IPSModule {
 
 		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('The url is "%s"', $url), 0);
 
-		$this->DownloadURL($url, $File);
+		$this->DownloadURL($url, __DIR__ . '/../../../media/' . $File);
 
 		$this->SendDebug(IPS_GetName($this->InstanceID), 'The graph was downloaded', 0);
 
