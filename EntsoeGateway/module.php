@@ -109,11 +109,21 @@ class EntsoEGateway extends IPSModule {
 	}
 
 	private function GetDayAheadGraph(array $Prices, string $ChildId, string $RequestId) {
-		//$chart = array('type' => 'line');
-		//$chart['data'] = 
+		$max = count($Prices);
+		for($i=0;$i<$max;$i++) {
+			$hours[]=$i;
+		}
+		
+		$chart = array('type' => 'line');
+		$chart['data'] = array('labels' => $hours);
+		$chart['data']['datasets'] = array(array('label' => 'Today', 'data' => $Prices));
 
+		$url = self::GRAPHS_BASE_URL . '/chart?bkg=white&c=' . urlencode(json_encode($chart));
+
+		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('GetDayAheadGraph() . url is "%s"', $url), 0);
 
 	}
+
 	private function GetDayAheadPrices(string $Area, string $ChildId, string $RequestId) {
 		$this->SendDebug(IPS_GetName($this->InstanceID), 'Requesting Day-Ahead prices....', 0);
 
@@ -179,7 +189,7 @@ class EntsoEGateway extends IPSModule {
 		$return['RequestId'] = $RequestId;
 		$return['Prices'] = $series;
 		$return['Rates'] = $this->GetExchangeRates($currency);
-		
+				
 		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Returning day-Ahead Prices to requesting child with Ident %s. Result sent is %s...',  $ChildId, json_encode($return)), 0);
 		$this->SendDataToChildren(json_encode(["DataID" => "{6E413DE8-C9F0-5E7F-4A69-07993C271FDC}", "ChildId" => $ChildId, "RequestId" => $RequestId,"Buffer" => $return]));
 	}
