@@ -58,6 +58,35 @@ trait WebCall {
 		return  (object)$response;
 	}
 
+    private function DownloadURL($Url, $Filename) {
+        $fp = fopen($Filename, 'w+');
+        
+       if($fp === false){
+           return false;
+       }
+       
+       $ch = curl_init($Url);
+        
+       curl_setopt($ch, CURLOPT_FILE, $fp);
+       curl_setopt($ch, CURLOPT_TIMEOUT, 45);
+        
+       curl_exec($ch);
+        
+       if(curl_errno($ch)) {
+           return false;
+           //throw new Exception(curl_error($ch));
+       }
+       
+       $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        
+       curl_close($ch);
+        
+       if($statusCode == 200)
+           return true;
+       else
+           return false;
+   }
+
     protected function isJson(string $Data) {
         json_decode($Data);
         return (json_last_error() == JSON_ERROR_NONE);

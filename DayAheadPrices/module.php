@@ -212,6 +212,12 @@ class DayAheadPrices extends IPSModule {
 		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Received data from parent. The data is %s', $JSONString), 0);
 		$data = json_decode($JSONString);
 
+		if(isset($data->Buffer->Error)) {
+			$this->LogMessage(sprintf('Received an error from the gateway. The error was "%s"',  $data->Buffer->Message), KL_ERROR);
+			$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Received an error from the gateway. The error was "%s"', $data->Buffer->Message), 0);
+			return;
+		}
+
 		if(isset($data->Buffer->Function)) {
 			$function = strtolower($data->Buffer->Function);
 			switch($function) {

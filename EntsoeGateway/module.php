@@ -10,6 +10,7 @@ class EntsoEGateway extends IPSModule {
 
 	const RATES_BASE_URL = 'http://api.exchangeratesapi.io/v1/latest';
 	const DAY_AHEAD_BASE_URL = 'https://transparency.entsoe.eu/api';
+	const GRAPHS_BASE_URL = 'https://quickchart.io';
 
 	public function Create() {
 		//Never delete this line!
@@ -66,34 +67,53 @@ class EntsoEGateway extends IPSModule {
 	private function HandleAsyncRequest(string $Requests) {
 		$requests = json_decode($Requests);
 
-		foreach($requests as $request) {
-		
-			if(!isset($request->Function)||!isset($request->ChildId)) {
-				throw new Exception(sprintf('Incoming request is invalid. Key "Function" and/or "ChildId" is missing. The request was "%s"', $request));
-			}
+		try {
+			foreach($requests as $request) {
 			
-			if(!isset($request->RequestId)) {
-				throw new Exception(sprintf('Incoming request is invalid. Key "RequestId" is missing. The request was "%s"', $request));
-			}
+				if(!isset($request->Function)||!isset($request->ChildId)) {
+					throw new Exception(sprintf('Incoming request is invalid. Key "Function" and/or "ChildId" is missing. The request was "%s"', $request));
+				}
+				
+				if(!isset($request->RequestId)) {
+					throw new Exception(sprintf('Incoming request is invalid. Key "RequestId" is missing. The request was "%s"', $request));
+				}
 
-			$function = strtolower($request->Function);
-			$childId =  $request->ChildId;
-			$requestId = $request->RequestId;
-			
-			switch($function) {
-				case 'getdayaheadprices':
-					if(!isset($request->Area)) {
-						throw new Exception(sprintf('Incoming request is invalid. Key "Area" is missing. The request was "%s"', $request));
-					}
+				$function = strtolower($request->Function);
+				$childId =  $request->ChildId;
+				$requestId = $request->RequestId;
+				
+				switch($function) {
+					case 'getdayaheadprices':
+						if(!isset($request->Area)) {
+							throw new Exception(sprintf('Incoming request is invalid. Key "Area" is missing. The request was "%s"', $request));
+						}
 
-					$this->GetDayAheadPrices($request->Area, $childId, $requestId);
-					break;
-				default:
-					throw new Exception(sprintf('Incoming request failed. Unknown function "%s"', $function));
+						$this->GetDayAheadPrices($request->Area, $childId, $requestId);
+						break;
+					case 'getdayaheadgraph':
+						if(!isset($request->Prices)) {
+							throw new Exception(sprintf('Incoming request is invalid. Key "Prices" is missing. The request was "%s"', $request));
+						}
+						
+						$this->GetDayAheadGraph($request->Prices, $childId, $requestId);
+						break;
+					default:
+						throw new Exception(sprintf('Incoming request failed. Unknown function "%s"', $function));
+				}
 			}
+		} catch(Exception $e) {
+			$buffer = array('Error' => true), 'Message' => $e->getMessage());
+			$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('HandleAsyncRequest() failed. The error was "%s"', $e->getMessage()), 0);
+			$this->SendDataToChildren(json_encode(["DataID" => "{6E413DE8-C9F0-5E7F-4A69-07993C271FDC}", "ChildId" => $ChildId, "RequestId" => $RequestId,"Buffer" => $buffer]));
 		}
 	}
 
+	private function GetDayAheadGraph(array $Prices, string $ChildId, string $RequestId) {
+		//$chart = array('type' => 'line');
+		//$chart['data'] = 
+
+
+	}
 	private function GetDayAheadPrices(string $Area, string $ChildId, string $RequestId) {
 		$this->SendDebug(IPS_GetName($this->InstanceID), 'Requesting Day-Ahead prices....', 0);
 
