@@ -69,7 +69,8 @@ class DayAheadPrices extends IPSModule {
 		}
 
 		$guid = self::GUID();
-		$file = __DIR__ . '/../../../media/DayAheadGraph.png';
+		//$file = __DIR__ . '/../../../media/DayAheadGraph.png';
+		$file = 'DayAheadGraph.png';
 		$data = json_decode($this->ReadAttributeString('Prices'));
 		$prices = $data->Prices->Points;//array(0.8,0.82,0.78,1.2,0.9);
 		$request[] = ['Function'=>'GetDayAheadPricesGraph', 'RequestId'=>$guid, 'ChildId'=>(string)$this->InstanceID, 'Prices'=>$prices, 'File'=>$file];
