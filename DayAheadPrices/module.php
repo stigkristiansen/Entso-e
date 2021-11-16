@@ -68,6 +68,7 @@ class DayAheadPrices extends IPSModule {
 			$this->InitTimer();
 		}
 
+		$guid = self::GUID();
 		$prices = array(0.8,0.02,0.78,1.2,0.9);
 		$request[] = ['Function'=>'GetDayAheadGraph', 'RequestId'=>$guid, 'ChildId'=>(string)$this->InstanceID, 'Prices'=>$prices];
 		$this->SendDataToParent(json_encode(['DataID' => '{8ED8DB86-AFE5-57AD-D638-505C91A39397}', 'Buffer' => $request]));

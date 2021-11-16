@@ -71,11 +71,11 @@ class EntsoEGateway extends IPSModule {
 			foreach($requests as $request) {
 			
 				if(!isset($request->Function)||!isset($request->ChildId)) {
-					throw new Exception(sprintf('Incoming request is invalid. Key "Function" and/or "ChildId" is missing. The request was "%s"', $request));
+					throw new Exception(sprintf('Incoming request is invalid. Key "Function" and/or "ChildId" is missing. The request was "%s"', $Requests));
 				}
 				
 				if(!isset($request->RequestId)) {
-					throw new Exception(sprintf('Incoming request is invalid. Key "RequestId" is missing. The request was "%s"', $request));
+					throw new Exception(sprintf('Incoming request is invalid. Key "RequestId" is missing. The request was "%s"', $Requests));
 				}
 
 				$function = strtolower($request->Function);
@@ -85,14 +85,14 @@ class EntsoEGateway extends IPSModule {
 				switch($function) {
 					case 'getdayaheadprices':
 						if(!isset($request->Area)) {
-							throw new Exception(sprintf('Incoming request is invalid. Key "Area" is missing. The request was "%s"', $request));
+							throw new Exception(sprintf('Incoming request is invalid. Key "Area" is missing. The request was "%s"', $Requests));
 						}
 
 						$this->GetDayAheadPrices($request->Area, $childId, $requestId);
 						break;
 					case 'getdayaheadgraph':
 						if(!isset($request->Prices)) {
-							throw new Exception(sprintf('Incoming request is invalid. Key "Prices" is missing. The request was "%s"', $request));
+							throw new Exception(sprintf('Incoming request is invalid. Key "Prices" is missing. The request was "%s"', $Requests));
 						}
 						
 						$this->GetDayAheadGraph($request->Prices, $childId, $requestId);
