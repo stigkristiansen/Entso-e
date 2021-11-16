@@ -58,33 +58,36 @@ trait WebCall {
 		return  (object)$response;
 	}
 
-    private function DownloadURL($Url, $Filename) {
+    private function DownloadURL($Url, $File) {
         $fp = fopen($Filename, 'w+');
+            
+        if($fp === false){
+            throw new Exception(sprintf('Failed to create file %s', $File));
+        }
         
-       if($fp === false){
-           return false;
-       }
+        $ch = curl_init($Url);
+        
+        curl_setopt($ch, CURLOPT_FILE, $fp);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 45);
+
+        $skipSSLCheck = $this->ReadPropertyBoolean('SkipSSLCheck');
+	    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, !$skipSSLCheck?0:2);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, !$skipSSLCheck);
+        
+        curl_exec($ch);
+        
+        if(curl_errno($ch)) {
+            throw new Exception(curl_error($ch));
+        }
        
-       $ch = curl_init($Url);
+       //$statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         
-       curl_setopt($ch, CURLOPT_FILE, $fp);
-       curl_setopt($ch, CURLOPT_TIMEOUT, 45);
+        curl_close($ch);
         
-       curl_exec($ch);
-        
-       if(curl_errno($ch)) {
-           return false;
-           //throw new Exception(curl_error($ch));
-       }
-       
-       $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        
-       curl_close($ch);
-        
-       if($statusCode == 200)
-           return true;
-       else
-           return false;
+       //if($statusCode == 200)
+       //    return true;
+       //else
+       //    return false;
    }
 
     protected function isJson(string $Data) {

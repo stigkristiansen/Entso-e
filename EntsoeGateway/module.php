@@ -90,12 +90,16 @@ class EntsoEGateway extends IPSModule {
 
 						$this->GetDayAheadPrices($request->Area, $childId, $requestId);
 						break;
-					case 'getdayaheadgraph':
+					case 'getdayaheadpricesgraph':
 						if(!isset($request->Prices)) {
 							throw new Exception(sprintf('Incoming request is invalid. Key "Prices" is missing. The request was "%s"', $Requests));
 						}
+
+						if(!isset($request->File)) {
+							throw new Exception(sprintf('Incoming request is invalid. Key "File" is missing. The request was "%s"', $Requests));
+						}
 						
-						$this->GetDayAheadGraph($request->Prices, $childId, $requestId);
+						$this->GetDayAheadPricesGraph($request->Prices, $request->File, $childId, $requestId);
 						break;
 					default:
 						throw new Exception(sprintf('Incoming request failed. Unknown function "%s"', $function));
@@ -108,7 +112,8 @@ class EntsoEGateway extends IPSModule {
 		}
 	}
 
-	private function GetDayAheadGraph(array $Prices, string $ChildId, string $RequestId) {
+	private function GetDayAheadPricesGraph(array $Prices, string $File, string $ChildId, string $RequestId) {
+		$this->SendDebug(IPS_GetName($this->InstanceID), 'Downloading DayAheadPrices Graph...', 0);
 		$max = count($Prices);
 		for($i=0;$i<$max;$i++) {
 			$hours[]=$i;
@@ -120,7 +125,16 @@ class EntsoEGateway extends IPSModule {
 
 		$url = self::GRAPHS_BASE_URL . '/chart?bkg=white&c=' . urlencode(json_encode($chart));
 
-		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('GetDayAheadGraph() . url is "%s"', $url), 0);
+		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('The url is "%s"', $url), 0);
+
+		$this->DownloadURL($url, $File);
+
+		$this->SendDebug(IPS_GetName($this->InstanceID), 'The graph was downloaded', 0);
+
+		$return = array('Function' => 'GetDayAheadPricesGraph');
+		$this->SendDataToChildren(json_encode(["DataID" => "{6E413DE8-C9F0-5E7F-4A69-07993C271FDC}", "ChildId" => $ChildId, "RequestId" => $RequestId,"Buffer" => $return]));
+
+
 
 	}
 
