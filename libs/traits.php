@@ -59,7 +59,7 @@ trait WebCall {
 	}
 
     private function DownloadURL($Url, $File) {
-        $fp = fopen($Filename, 'w+');
+        $fp = fopen($File, 'w+');
             
         if($fp === false){
             throw new Exception(sprintf('Failed to create file %s', $File));
