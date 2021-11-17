@@ -123,7 +123,7 @@ class DayAheadPrices extends IPSModule {
 					$this->SendDebug(IPS_GetName($this->InstanceID), 'GetDayAheadPricesGraph completed successfully', 0);
 					$file = urldecode($data->Buffer->File);
 					
-					$id = $this->CreateMediaByName($this->InstanceId, 'DayAheadPrices', 1, 'DayAheadPrices');
+					$id = $this->CreateMediaByName($this->InstanceID, 'DayAheadPrices', 1, 'DayAheadPrices');
 					if($id!==false) {
 						IPS_SetMediaFile($id, $file, false);
 					}
