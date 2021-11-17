@@ -169,7 +169,7 @@ class DayAheadPrices extends IPSModule {
 		$rate = $factors->Rate;
 
 		$max = count($prices->Prices->Points);
-		for($i=0,$i<$max;$i++) {
+		for($i=0;$i<$max;$i++) {
 			$points[] = $prices->Prices->Points[$i]/$divider*$rate;
 		}
 
