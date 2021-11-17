@@ -53,28 +53,22 @@ class DayAheadPrices extends IPSModule {
 			case 'NOK':
 			case 'SEK':
 			case 'DKK':
-				$profileSuffix = ' kr/kWh';
+				$profileSuffix = 'kr/kWh';
 				break;
 			case 'EUR':
-				$profileSuffix = ' €/kWh';
+				$profileSuffix = '€/kWh';
 				break;
 			default:
-				$profileSuffix = ' price/kWh';
+				$profileSuffix = 'price/kWh';
 		}
 		
-		IPS_SetVariableProfileText('ESEDA.Price', '', $profileSuffix);
+		IPS_SetVariableProfileText('ESEDA.Price', '', ' '.$profileSuffix);
 		
 		if (IPS_GetKernelRunlevel() == KR_READY) {
 			$this->InitTimer();
 		}
 
-		$guid = self::GUID();
-		$file = urlencode(__DIR__ . '/../../../media/DayAheadGraph.png');
-		//$file = 'DayAheadGraph.png';
-		$data = json_decode($this->ReadAttributeString('Prices'));
-		$prices = $data->Prices->Points;//array(0.8,0.82,0.78,1.2,0.9);
-		$request[] = ['Function'=>'GetDayAheadPricesGraph', 'RequestId'=>$guid, 'ChildId'=>(string)$this->InstanceID, 'Prices'=>$prices, 'File'=>$file];
-		$this->SendDataToParent(json_encode(['DataID' => '{8ED8DB86-AFE5-57AD-D638-505C91A39397}', 'Buffer' => $request]));
+		//$this->UpdateGraph();
 
 		$this->HandleData();
 	}
@@ -123,22 +117,78 @@ class DayAheadPrices extends IPSModule {
 	private function HandleData() {
 		$fetchPrices = $this->EvaluateAttribute('Prices');
 		$fetchRates  = $this->EvaluateAttribute('Rates');
+		$fetchGraph =  !file_exists(__DIR__ . '/../../../media/DayAheadGraph.png');
 
-		if($fetchPrices||$fetchRates) {
+		if($fetchPrices||$fetchRates||$fetchGraph) {
 			$this->RequestData();
 		} else {
 			$this->UpdateVariables();
 		}
 	}
 
+	private function GetFactors($Prices, $Rates) {
+		switch(strtolower($Prices->Prices->MeasureUnit)) {
+			case 'wh':
+				$divider = 0.001;
+				break;
+			case 'kwh':
+				$divider = 1;
+				break;
+			case 'mwh': 
+				$divider = 1000;
+				break;
+			case 'gwh':
+				$divider = 1000000;
+				break;
+		}
+
+		switch($this->ReadPropertyString('ReportCurrency')) {
+			case 'NOK':
+				$rate = $Rates->Rates->rates->NOK;
+				break;
+			case 'EUR':
+				$rate = $rates->Rates->rates->EUR;
+				break;
+			case 'SEK':
+				$rate = $rates->Rates->rates->SEK;
+				break;
+			case 'DKK':
+				$rate = $rates->Rates->rates->DKK;
+				break;
+		}
+
+		return (object)array('Divider'=>$divider, 'Rate'=>$rate);
+	}
+
 	private function UpdateGraph() {
+		$prices = json_decode($this->ReadAttributeString('Prices'));
+		$rates =  json_decode($this->ReadAttributeString('Rates'));
+		
+		$factors = $this->GetFactors($prices, $rates);
+		$divider = $factors->Divider;
+		$rate = $factors->Rate;
+
+		$max = count($prices->Prices->Points);
+		for($i=0,$i<$max;$i++) {
+			$points[] = $prices->Prices->Points[$i]/$divider*$rate;
+		}
+
+		$guid = self::GUID();
+		$file = urlencode(__DIR__ . '/../../../media/DayAheadGraph.png');
+		$request[] = ['Function'=>'GetDayAheadPricesGraph', 'RequestId'=>$guid, 'ChildId'=>(string)$this->InstanceID, 'Points'=>$points, 'File'=>$file];
+		$this->SendDataToParent(json_encode(['DataID' => '{8ED8DB86-AFE5-57AD-D638-505C91A39397}', 'Buffer' => $request]));
 
 	}
 
 	private function UpdateVariables() {
-		$data = json_decode($this->ReadAttributeString('Prices'));
+		$prices = json_decode($this->ReadAttributeString('Prices'));
 		$rates =  json_decode($this->ReadAttributeString('Rates'));
-
+		
+		$factors = $this->GetFactors($prices, $rates);
+		$divider = $factors->Divider;
+		$rate = $factors->Rate;
+		
+		/*
 		switch(strtolower($data->Prices->MeasureUnit)) {
 			case 'wh':
 				$divider = 0.001;
@@ -168,8 +218,9 @@ class DayAheadPrices extends IPSModule {
 				$rate = $rates->Rates->rates->DKK;
 				break;
 		}
-		
-		$entsoeCurrency = $data->Prices->Currency;
+		*/
+
+		$entsoeCurrency = $prices->Prices->Currency;
 		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Prices from Entso-e are reported in %s', $entsoeCurrency), 0);
 		
 		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Variables show prices in %s', $this->ReadPropertyString('ReportCurrency')), 0);
@@ -180,7 +231,7 @@ class DayAheadPrices extends IPSModule {
 		
 		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Divider is: %s', (string)$divider), 0);
 		
-		$stats = $this->GetStats($data->Prices->Points);
+		$stats = $this->GetStats($prices->Prices->Points);
 
 		$this->SendDebug(IPS_GetName($this->InstanceID), 'Updating variables...', 0);
 		$this->SetValue('Current', $stats->current/$divider*$rate);
@@ -243,7 +294,7 @@ class DayAheadPrices extends IPSModule {
 					$this->UpdateGraph();
 					return;
 				case 'getdayaheadpricesgraph':
-					$this->SendDebug(IPS_GetName($this->InstanceID), 'Received response from GetDayAheadPricesGraph', 0);
+					$this->SendDebug(IPS_GetName($this->InstanceID), 'GetDayAheadPricesGraph completed successfully', 0);
 					// Update image object in IPS....
 					return;
 				default:

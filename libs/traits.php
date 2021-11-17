@@ -79,15 +79,8 @@ trait WebCall {
         if(curl_errno($ch)) {
             throw new Exception(curl_error($ch));
         }
-       
-       //$statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         
         curl_close($ch);
-        
-       //if($statusCode == 200)
-       //    return true;
-       //else
-       //    return false;
    }
 
     protected function isJson(string $Data) {

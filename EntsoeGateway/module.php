@@ -92,15 +92,15 @@ class EntsoEGateway extends IPSModule {
 						$this->GetDayAheadPrices($request->Area, $childId, $requestId);
 						break;
 					case 'getdayaheadpricesgraph':
-						if(!isset($request->Prices)) {
-							throw new Exception(sprintf('Incoming request is invalid. Key "Prices" is missing. The request was "%s"', $Requests));
+						if(!isset($request->Points)) {
+							throw new Exception(sprintf('Incoming request is invalid. Key "Points" is missing. The request was "%s"', $Requests));
 						}
 
 						if(!isset($request->File)) {
 							throw new Exception(sprintf('Incoming request is invalid. Key "File" is missing. The request was "%s"', $Requests));
 						}
 						
-						$this->GetDayAheadPricesGraph($request->Prices, $request->File, $childId, $requestId);
+						$this->GetDayAheadPricesGraph($request->Points, $request->File, $childId, $requestId);
 						break;
 					default:
 						throw new Exception(sprintf('Incoming request failed. Unknown function "%s"', $function));
@@ -113,16 +113,17 @@ class EntsoEGateway extends IPSModule {
 		}
 	}
 
-	private function GetDayAheadPricesGraph(array $Prices, string $File, string $ChildId, string $RequestId) {
+	private function GetDayAheadPricesGraph(array $Points, string $File, string $ChildId, string $RequestId) {
 		$this->SendDebug(IPS_GetName($this->InstanceID), 'Downloading DayAheadPrices Graph...', 0);
-		$max = count($Prices);
+		
+		$max = count($Points);
 		for($i=0;$i<$max;$i++) {
 			$hours[]=$i;
 		}
 		
 		$chart = array('type' => 'line');
 		$chart['data'] = array('labels' => $hours);
-		$chart['data']['datasets'] = array(array('label' => 'Today', 'data' => $Prices));
+		$chart['data']['datasets'] = array(array('label' => 'Today', 'data' => $Points));
 
 		$url = self::GRAPHS_BASE_URL . '/chart?bkg=white&c=' . urlencode(json_encode($chart));
 
@@ -134,9 +135,6 @@ class EntsoEGateway extends IPSModule {
 
 		$return = array('Function' => 'GetDayAheadPricesGraph');
 		$this->SendDataToChildren(json_encode(["DataID" => "{6E413DE8-C9F0-5E7F-4A69-07993C271FDC}", "ChildId" => $ChildId, "RequestId" => $RequestId,"Buffer" => $return]));
-
-
-
 	}
 
 	private function GetDayAheadPrices(string $Area, string $ChildId, string $RequestId) {
