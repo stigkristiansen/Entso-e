@@ -7,6 +7,7 @@ include __DIR__ . "/../libs/traits.php";
 class DayAheadPrices extends IPSModule {
 	use utility;
 	use profiles;
+	use Media;
 
 	public function Create() {
 		//Never delete this line!
@@ -68,8 +69,6 @@ class DayAheadPrices extends IPSModule {
 			$this->InitTimer();
 		}
 
-		//$this->UpdateGraph();
-
 		$this->HandleData();
 	}
 
@@ -97,6 +96,47 @@ class DayAheadPrices extends IPSModule {
 			$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('RequestAction failed. The error was "%s"', $e->getMessage()), 0);
 		}
 	}	
+
+	public function ReceiveData($JSONString) {
+		$data = json_decode($JSONString);
+
+		if(isset($data->Buffer->Error)) {
+			$this->LogMessage(sprintf('Received an error from the gateway. The error was "%s"',  $data->Buffer->Message), KL_ERROR);
+			$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Received an error from the gateway. The error was "%s"', $data->Buffer->Message), 0);
+			return;
+		}
+
+		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Received data from the gateway. The data is %s', $JSONString), 0);
+
+		if(isset($data->Buffer->Function)) {
+			$function = strtolower($data->Buffer->Function);
+			switch($function) {
+				case 'getdayaheadprices':
+					$prices = $data->Buffer->Prices;
+					$rates = $data->Buffer->Rates;
+					$this->UpdatePrices($prices);
+					$this->UpdateRates($rates);
+					$this->UpdateVariables();
+					$this->UpdateGraph();
+					return;
+				case 'getdayaheadpricesgraph':
+					$this->SendDebug(IPS_GetName($this->InstanceID), 'GetDayAheadPricesGraph completed successfully', 0);
+					$file = urldecode($data->Buffer->file);
+					
+					$id = $this->CreateMediaByName($this->InstanceId, 'DayAheadPrices', 1, 'DayAheadPrices');
+					if($id!==false) {
+						IPS_SetMediaFile($id, $file, false);
+					}
+					return;
+				default:
+					$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Unsupported function "%s"', $function), 0);
+					return;
+			}
+		}
+
+		$this->SendDebug(IPS_GetName($this->InstanceID), 'Invalid data received from parent', 0);
+
+	}
 	
 	private function Refresh() {
 		$this->SetTimerInterval('EntoseDayAheadRefresh' . (string)$this->InstanceID, 3600*1000);
@@ -188,38 +228,6 @@ class DayAheadPrices extends IPSModule {
 		$divider = $factors->Divider;
 		$rate = $factors->Rate;
 		
-		/*
-		switch(strtolower($data->Prices->MeasureUnit)) {
-			case 'wh':
-				$divider = 0.001;
-				break;
-			case 'kwh':
-				$divider = 1;
-				break;
-			case 'mwh': 
-				$divider = 1000;
-				break;
-			case 'gwh':
-				$divider = 1000000;
-				break;
-		}
-
-		switch($this->ReadPropertyString('ReportCurrency')) {
-			case 'NOK':
-				$rate = $rates->Rates->rates->NOK;
-				break;
-			case 'EUR':
-				$rate = $rates->Rates->rates->EUR;
-				break;
-			case 'SEK':
-				$rate = $rates->Rates->rates->SEK;
-				break;
-			case 'DKK':
-				$rate = $rates->Rates->rates->DKK;
-				break;
-		}
-		*/
-
 		$entsoeCurrency = $prices->Prices->Currency;
 		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Prices from Entso-e are reported in %s', $entsoeCurrency), 0);
 		
@@ -271,41 +279,7 @@ class DayAheadPrices extends IPSModule {
 		return $fetchData;
 	}
 
-	public function ReceiveData($JSONString) {
-		$data = json_decode($JSONString);
-
-		if(isset($data->Buffer->Error)) {
-			$this->LogMessage(sprintf('Received an error from the gateway. The error was "%s"',  $data->Buffer->Message), KL_ERROR);
-			$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Received an error from the gateway. The error was "%s"', $data->Buffer->Message), 0);
-			return;
-		}
-
-		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Received data from the gateway. The data is %s', $JSONString), 0);
-
-		if(isset($data->Buffer->Function)) {
-			$function = strtolower($data->Buffer->Function);
-			switch($function) {
-				case 'getdayaheadprices':
-					$prices = $data->Buffer->Prices;
-					$rates = $data->Buffer->Rates;
-					$this->UpdatePrices($prices);
-					$this->UpdateRates($rates);
-					$this->UpdateVariables();
-					$this->UpdateGraph();
-					return;
-				case 'getdayaheadpricesgraph':
-					$this->SendDebug(IPS_GetName($this->InstanceID), 'GetDayAheadPricesGraph completed successfully', 0);
-					// Update image object in IPS....
-					return;
-				default:
-					$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Unsupported function "%s"', $function), 0);
-					return;
-			}
-		}
-
-		$this->SendDebug(IPS_GetName($this->InstanceID), 'Invalid data received from parent', 0);
-
-	}
+	
 
 	private function UpdateRates(object $Rates) {
 		$now = new DateTime('Now');
@@ -352,4 +326,6 @@ class DayAheadPrices extends IPSModule {
 		return (object)$stats;
 		
 	}
+
+
 }

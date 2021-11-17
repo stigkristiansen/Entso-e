@@ -100,7 +100,34 @@ trait Utility {
         return sprintf('{%04X%04X-%04X-%04X-%04X-%04X%04X%04X}', mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(16384, 20479), mt_rand(32768, 49151), mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(0, 65535));
     }
 
+    protected function DayToString(int $AddDays=0) {
+        $now = new DateTime('now');
+        if($AddDays!=0) {
+            if($AddDays>0) {
+                $now->add(DateInterval::createFromDateString((string)$AddDays.' day'));
+            } else {
+                $now->sub(DateInterval::createFromDateString((string)-1*$AddDays.' day'));
+            }
+            
+        }
+        		               
+        return $now->format('Y.m.d');
+    }
+}
 
+trait Media {
+    protected function CreateMediaByName(int $Parent, string $Name, int $Type, string $Ident){
+		$id = @IPS_GetMediaIDByName($Name, $Parent);
+		if($id === false) {
+		  $id = IPS_CreateMedia($Type);
+		  IPS_SetParent($id, $Parent);
+		  IPS_SetName($id, $Name);
+		  IPS_SetInfo($id, "This media object was created by the Entso-E library");
+		  IPS_SetIdent($id, $Ident);
+		}
+		
+        return $mId;
+	}
 }
 
 

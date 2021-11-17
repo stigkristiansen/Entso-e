@@ -133,7 +133,7 @@ class EntsoEGateway extends IPSModule {
 
 		$this->SendDebug(IPS_GetName($this->InstanceID), 'The graph was downloaded', 0);
 
-		$return = array('Function' => 'GetDayAheadPricesGraph');
+		$return = array('Function' => 'GetDayAheadPricesGraph', 'File'=> $File);
 		$this->SendDataToChildren(json_encode(["DataID" => "{6E413DE8-C9F0-5E7F-4A69-07993C271FDC}", "ChildId" => $ChildId, "RequestId" => $RequestId,"Buffer" => $return]));
 	}
 
