@@ -126,7 +126,7 @@ trait Media {
 		  IPS_SetIdent($id, $Ident);
 		}
 		
-        return $mId;
+        return $id;
 	}
 }
 
