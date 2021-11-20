@@ -15,6 +15,16 @@
                 {"caption":"SEK", "value":"SEK"}
             ] 
         },
+        {
+            "type":"Select", "name":"DateFormat", "caption":"Date Format" , 
+            "options":[ 
+                {"caption":"dd.mm.yyyy", "value":"d.m.Y"}, 
+                {"caption":"yyyy-mm-dd", "value":"Y-m-d"}, 
+                {"caption":"dd-mm-yyyy", "value":"d-m-Y"}, 
+                {"caption":"dd/mm/yy", "value":"d/m/y"},
+                {"caption":"dd/mm/yyyy", "value":"d/m/Y"}    
+            ] 
+        },
         {  
             "type":"Select", "name":"Area", "caption":"Area" , 
             "options":[ 

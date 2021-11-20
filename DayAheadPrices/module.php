@@ -17,6 +17,7 @@ class DayAheadPrices extends IPSModule {
 
 		$this->RegisterPropertyString('Area', '10YNO-1--------2');
 		$this->RegisterPropertyString('ReportCurrency', 'NOK');
+		$this->RegisterPropertyString('DateFormat', 'd.m.Y');
 
 		$this->RegisterAttributeString('Prices', '');
 		$this->RegisterAttributeString('Rates', '');
@@ -118,15 +119,17 @@ class DayAheadPrices extends IPSModule {
 					$this->UpdateRates($rates);
 					$this->UpdateVariables();
 					$this->UpdateGraph();
+					$this->SendDebug(IPS_GetName($this->InstanceID), 'GetDayAheadPrices completed successfully', 0);
 					return;
 				case 'getdayaheadpricesgraph':
-					$this->SendDebug(IPS_GetName($this->InstanceID), 'GetDayAheadPricesGraph completed successfully', 0);
 					$file = urldecode($data->Buffer->File);
 					
 					$id = $this->CreateMediaByName($this->InstanceID, 'DayAheadPrices', 1, 'DayAheadPrices');
 					if($id!==false) {
 						IPS_SetMediaFile($id, $file, false);
 					}
+					
+					$this->SendDebug(IPS_GetName($this->InstanceID), 'GetDayAheadPricesGraph completed successfully', 0);
 					return;
 				default:
 					$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Unsupported function "%s"', $function), 0);
@@ -215,7 +218,11 @@ class DayAheadPrices extends IPSModule {
 
 		$guid = self::GUID();
 		$file = urlencode(__DIR__ . '/../../../media/DayAheadGraph.png');
-		$request[] = ['Function'=>'GetDayAheadPricesGraph', 'RequestId'=>$guid, 'ChildId'=>(string)$this->InstanceID, 'Points'=>$points, 'File'=>$file];
+
+		$now = new DateTime('Now');
+		$today = $now->format($this->ReadPropertyString('DateFormat'));
+		
+		$request[] = ['Function'=>'GetDayAheadPricesGraph', 'RequestId'=>$guid, 'ChildId'=>(string)$this->InstanceID, 'Points'=>$points, 'File'=>$file, 'Date'=>$today];
 		$this->SendDataToParent(json_encode(['DataID' => '{8ED8DB86-AFE5-57AD-D638-505C91A39397}', 'Buffer' => $request]));
 
 	}

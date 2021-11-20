@@ -99,8 +99,12 @@ class EntsoEGateway extends IPSModule {
 						if(!isset($request->File)) {
 							throw new Exception(sprintf('Incoming request is invalid. Key "File" is missing. The request was "%s"', $Requests));
 						}
+
+						if(!isset($request->Date)) {
+							throw new Exception(sprintf('Incoming request is invalid. Key "Date" is missing. The request was "%s"', $Requests));
+						}
 						
-						$this->GetDayAheadPricesGraph($request->Points, $request->File, $childId, $requestId);
+						$this->GetDayAheadPricesGraph($request->Points, $request->File, $request->Date, $childId, $requestId);
 						break;
 					default:
 						throw new Exception(sprintf('Incoming request failed. Unknown function "%s"', $function));
@@ -113,7 +117,7 @@ class EntsoEGateway extends IPSModule {
 		}
 	}
 
-	private function GetDayAheadPricesGraph(array $Points, string $File, string $ChildId, string $RequestId) {
+	private function GetDayAheadPricesGraph(array $Points, string $File, string $Date, string $ChildId, string $RequestId) {
 		$this->SendDebug(IPS_GetName($this->InstanceID), 'Downloading DayAheadPrices Graph...', 0);
 		
 		$max = count($Points);
@@ -123,7 +127,7 @@ class EntsoEGateway extends IPSModule {
 		
 		$chart = array('type' => 'line');
 		$chart['data'] = array('labels' => $hours);
-		$chart['data']['datasets'] = array(array('label' => 'Today', 'data' => $Points));
+		$chart['data']['datasets'] = array(array('label' => $Date, 'data' => $Points));
 
 		$url = self::GRAPHS_BASE_URL . '/chart?bkg=white&c=' . urlencode(json_encode($chart));
 
