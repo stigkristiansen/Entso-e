@@ -113,7 +113,10 @@ class EntsoEGateway extends IPSModule {
 		} catch(Exception $e) {
 			$buffer = array('Error' => true, 'Message' => $e->getMessage());
 			$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('HandleAsyncRequest() failed. The error was "%s"', $e->getMessage()), 0);
-			$this->SendDataToChildren(json_encode(["DataID" => "{6E413DE8-C9F0-5E7F-4A69-07993C271FDC}", "ChildId" => $ChildId, "RequestId" => $RequestId,"Buffer" => $buffer]));
+			if(isset($request->ChildId)) {
+				$requestId= isset($request->RequestId)?$request->RequestId:'Unknown';
+				$this->SendDataToChildren(json_encode(["DataID" => "{6E413DE8-C9F0-5E7F-4A69-07993C271FDC}", "ChildId" => $childId, "RequestId" => $requestId,"Buffer" => $buffer]));
+			}
 		}
 	}
 
