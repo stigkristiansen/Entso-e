@@ -18,6 +18,7 @@ class DayAheadPrices extends IPSModule {
 		$this->RegisterPropertyString('Area', '10YNO-1--------2');
 		$this->RegisterPropertyString('ReportCurrency', 'NOK');
 		$this->RegisterPropertyString('DateFormat', 'd.m.Y');
+		$this->RegisterPropertyInteger('VAT', 25);
 
 		$this->RegisterAttributeString('Prices', '');
 		$this->RegisterAttributeString('Rates', '');
@@ -210,10 +211,11 @@ class DayAheadPrices extends IPSModule {
 		$factors = $this->GetFactors($prices, $rates);
 		$divider = $factors->Divider;
 		$rate = $factors->Rate;
+		$vat = 1 + $this->ReadPropertyInteger('VAT')/100;
 
 		$max = count($prices->Prices->Points);
 		for($i=0;$i<$max;$i++) {
-			$points[] = $prices->Prices->Points[$i]/$divider*$rate;
+			$points[] = $prices->Prices->Points[$i]/$divider*$rate*$vat;
 		}
 
 		$guid = self::GUID();
@@ -234,7 +236,8 @@ class DayAheadPrices extends IPSModule {
 		$factors = $this->GetFactors($prices, $rates);
 		$divider = $factors->Divider;
 		$rate = $factors->Rate;
-		
+		$vat = 1 + $this->ReadPropertyInteger('VAT')/100;
+
 		$entsoeCurrency = $prices->Prices->Currency;
 		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Prices from Entso-e are reported in %s', $entsoeCurrency), 0);
 		
@@ -249,11 +252,11 @@ class DayAheadPrices extends IPSModule {
 		$stats = $this->GetStats($prices->Prices->Points);
 
 		$this->SendDebug(IPS_GetName($this->InstanceID), 'Updating variables...', 0);
-		$this->SetValue('Current', $stats->current/$divider*$rate);
-		$this->SetValue('High', $stats->high/$divider*$rate);
-		$this->SetValue('Low', $stats->low/$divider*$rate);
-		$this->SetValue('Avg', $stats->avg/$divider*$rate);
-		$this->SetValue('Median', $stats->median/$divider*$rate);
+		$this->SetValue('Current', $stats->current/$divider*$rate*$vat);
+		$this->SetValue('High', $stats->high/$divider*$rate*$vat);
+		$this->SetValue('Low', $stats->low/$divider*$rate*$vat);
+		$this->SetValue('Avg', $stats->avg/$divider*$rate*$vat);
+		$this->SetValue('Median', $stats->median/$divider*$rate*$vat);
 		
 	}
 

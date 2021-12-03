@@ -16,6 +16,9 @@
             ] 
         },
         {
+            "type":"NumberSpinner", "name":"VAT", "caption":"VAT", "suffix":"%"
+        },
+        {
             "type":"Select", "name":"DateFormat", "caption":"Date Format" , 
             "options":[ 
                 {"caption":"dd.mm.yyyy", "value":"d.m.Y"}, 
