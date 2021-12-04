@@ -224,6 +224,7 @@ class DayAheadPrices extends IPSModule {
 		$now = new DateTime('Now');
 		$today = $now->format($this->ReadPropertyString('DateFormat'));
 		
+		
 		$request[] = ['Function'=>'GetDayAheadPricesGraph', 'RequestId'=>$guid, 'ChildId'=>(string)$this->InstanceID, 'Points'=>$points, 'File'=>$file, 'Date'=>$today];
 		$this->SendDataToParent(json_encode(['DataID' => '{8ED8DB86-AFE5-57AD-D638-505C91A39397}', 'Buffer' => $request]));
 
