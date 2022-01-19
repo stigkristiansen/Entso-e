@@ -56,6 +56,5 @@
             "onClick":"ESEDA_UpdateGraph($id);", 
             "confirm":"This will refresh the Day Ahead Prices Graph. Are you sure?" 
         }
-    ],
-    "status": []
+    ]
 }
