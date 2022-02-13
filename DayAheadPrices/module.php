@@ -143,7 +143,8 @@ class DayAheadPrices extends IPSModule {
 	}
 	
 	private function Refresh() {
-		$this->SetTimerInterval('EntoseDayAheadRefresh' . (string)$this->InstanceID, 3600*1000);
+		//$this->SetTimerInterval('EntoseDayAheadRefresh' . (string)$this->InstanceID, 3600*1000);
+		$this->InitTimer();
 
 		$this->HandleData();
 	}
