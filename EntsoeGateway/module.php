@@ -9,7 +9,7 @@ class EntsoEGateway extends IPSModule {
 	use WebCall;
 
 	const RATES_BASE_URL = 'http://api.exchangeratesapi.io/v1/latest';
-	const DAY_AHEAD_BASE_URL = 'https://transparency.entsoe.eu/api';
+	const DAY_AHEAD_BASE_URL = 'https://web-api.tp.entsoe.eu/api';
 	const GRAPHS_BASE_URL = 'https://quickchart.io';
 
 	public function Create() {
