@@ -84,7 +84,7 @@ class DayAheadPrices extends IPSModule {
 
 	public function RequestAction($Ident, $Value) {
 		try {
-			$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('ReqestAction called for Ident "%s" with Value %s', $Ident, (string)$Value), 0);
+			$this->SendDebug(__FUNCTION__, sprintf('ReqestAction called for Ident "%s" with Value %s', $Ident, (string)$Value), 0);
 
 			switch (strtolower($Ident)) {
 				case 'refresh':
@@ -95,7 +95,7 @@ class DayAheadPrices extends IPSModule {
 			}
 		} catch(Exception $e) {
 			$this->LogMessage(sprintf('RequestAction failed. The error was "%s"',  $e->getMessage()), KL_ERROR);
-			$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('RequestAction failed. The error was "%s"', $e->getMessage()), 0);
+			$this->SendDebug(__FUNCTION__, sprintf('RequestAction failed. The error was "%s"', $e->getMessage()), 0);
 		}
 	}	
 
@@ -104,11 +104,11 @@ class DayAheadPrices extends IPSModule {
 
 		if(isset($data->Buffer->Error)) {
 			$this->LogMessage(sprintf('Received an error from the gateway. The error was "%s"',  $data->Buffer->Message), KL_ERROR);
-			$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Received an error from the gateway. The error was "%s"', $data->Buffer->Message), 0);
+			$this->SendDebug(__FUNCTION__, sprintf('Received an error from the gateway. The error was "%s"', $data->Buffer->Message), 0);
 			return;
 		}
 
-		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Received data from the gateway. The data is %s', $JSONString), 0);
+		$this->SendDebug(__FUNCTION__, sprintf('Received data from the gateway. The data is %s', $JSONString), 0);
 
 		if(isset($data->Buffer->Function)) {
 			$function = strtolower($data->Buffer->Function);
@@ -120,7 +120,7 @@ class DayAheadPrices extends IPSModule {
 					$this->UpdateRates($rates);
 					$this->UpdateVariables();
 					$this->UpdateGraph();
-					$this->SendDebug(IPS_GetName($this->InstanceID), 'GetDayAheadPrices completed successfully', 0);
+					$this->SendDebug(__FUNCTION__, 'GetDayAheadPrices completed successfully', 0);
 					return;
 				case 'getdayaheadpricesgraph':
 					$file = urldecode($data->Buffer->File);
@@ -130,15 +130,15 @@ class DayAheadPrices extends IPSModule {
 						IPS_SetMediaFile($id, $file, false);
 					}
 					
-					$this->SendDebug(IPS_GetName($this->InstanceID), 'GetDayAheadPricesGraph completed successfully', 0);
+					$this->SendDebug(__FUNCTION__, 'GetDayAheadPricesGraph completed successfully', 0);
 					return;
 				default:
-					$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Unsupported function "%s"', $function), 0);
+					$this->SendDebug(__FUNCTION__, sprintf('Unsupported function "%s"', $function), 0);
 					return;
 			}
 		}
 
-		$this->SendDebug(IPS_GetName($this->InstanceID), 'Invalid data received from parent', 0);
+		$this->SendDebug(__FUNCTION__, 'Invalid data received from parent', 0);
 
 	}
 	
@@ -241,19 +241,19 @@ class DayAheadPrices extends IPSModule {
 		$vat = 1 + $this->ReadPropertyInteger('VAT')/100;
 
 		$entsoeCurrency = $prices->Prices->Currency;
-		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Prices from Entso-e are reported in %s', $entsoeCurrency), 0);
+		$this->SendDebug(__FUNCTION__, sprintf('Prices from Entso-e are reported in %s', $entsoeCurrency), 0);
 		
-		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Variables show prices in %s', $this->ReadPropertyString('ReportCurrency')), 0);
+		$this->SendDebug(__FUNCTION__, sprintf('Variables show prices in %s', $this->ReadPropertyString('ReportCurrency')), 0);
 		
 		if($entsoeCurrency!=$this->ReadPropertyString('ReportCurrency')) {
-			$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('1 %s is %s %s', $entsoeCurrency, (string)$rate, $this->ReadPropertyString('ReportCurrency')), 0);
+			$this->SendDebug(__FUNCTION__, sprintf('1 %s is %s %s', $entsoeCurrency, (string)$rate, $this->ReadPropertyString('ReportCurrency')), 0);
 		}
 		
-		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Divider is: %s', (string)$divider), 0);
+		$this->SendDebug(__FUNCTION__, sprintf('Divider is: %s', (string)$divider), 0);
 		
 		$stats = $this->GetStats($prices->Prices->Points);
 
-		$this->SendDebug(IPS_GetName($this->InstanceID), 'Updating variables...', 0);
+		$this->SendDebug(__FUNCTION__, 'Updating variables...', 0);
 		$this->SetValue('Current', $stats->current/$divider*$rate*$vat);
 		$this->SetValue('High', $stats->high/$divider*$rate*$vat);
 		$this->SetValue('Low', $stats->low/$divider*$rate*$vat);
@@ -272,19 +272,19 @@ class DayAheadPrices extends IPSModule {
 		if(strlen($data)>0) {
 			$day = json_decode($data);
 
-			$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Data in attribute "%s" is "%s"', $Name, $data), 0);
+			$this->SendDebug(__FUNCTION__, sprintf('Data in attribute "%s" is "%s"', $Name, $data), 0);
 			
 			if(isset($day->Date)) {
 				if($day->Date!=$today) {
-					$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Attribute "%s" has old data! Fetching new data', $Name), 0);
+					$this->SendDebug(__FUNCTION__, sprintf('Attribute "%s" has old data! Fetching new data', $Name), 0);
 					$fetchData = true;						
 				}
 			} else {
-				$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Attribute "%s" has invalid data! Fetching new data', $Name), 0);
+				$this->SendDebug(__FUNCTION__, sprintf('Attribute "%s" has invalid data! Fetching new data', $Name), 0);
 				$fetchData = true;
 			}
 		} else {
-			$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Attribute "%s" is empty! Fetching new data', $Name), 0);
+			$this->SendDebug(__FUNCTION__, sprintf('Attribute "%s" is empty! Fetching new data', $Name), 0);
 			$fetchData = true;
 		}
 
@@ -314,7 +314,7 @@ class DayAheadPrices extends IPSModule {
 	}
 
 	private function GetStats($Prices) {
-		$this->SendDebug(IPS_GetName($this->InstanceID), 'Calculating statistics...', 0);
+		$this->SendDebug(__FUNCTION__, 'Calculating statistics...', 0);
 		$date = new DateTime('Now');
 		$currentIndex = $date->format('G');
 		
@@ -331,7 +331,7 @@ class DayAheadPrices extends IPSModule {
 
 		$stats['median'] = $count%2==0?(float)($Prices[$index-1]+$Prices[$index])/2:(float)$Prices[$index];
 
-		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Calculated statistics: %s', json_encode($stats)), 0);
+		$this->SendDebug(__FUNCTION__, sprintf('Calculated statistics: %s', json_encode($stats)), 0);
 
 		return (object)$stats;
 	}
@@ -341,7 +341,7 @@ class DayAheadPrices extends IPSModule {
 			throw new Exception('Invalid parameter "Timeframe". Timeframe must be grater than 0 and less than 25'); 
 		}
 
-		$this->SendDebug(IPS_GetName($this->InstanceID).':'.__FUNCTION__, 'Calculating the lowest price interval...', 0);
+		$this->SendDebug(__FUNCTION__, 'Calculating the lowest price interval...', 0);
 
 		$prices = json_decode($this->ReadAttributeString('Prices'));
 		$points = $prices->Prices->Points;
@@ -365,7 +365,7 @@ class DayAheadPrices extends IPSModule {
 
 		$interval = array('StartHour'=>$lowestIdx, 'EndHour'=>$lowestIdx+$Timeframe-1);
 
-		$this->SendDebug(IPS_GetName($this->InstanceID).':'.__FUNCTION__, 'The lowest price interval is: ' . json_encode($interval), 0);
+		$this->SendDebug(__FUNCTION__, sprintf('The lowest price interval is: %s', json_encode($interval)), 0);
 
 		return $interval;
 
