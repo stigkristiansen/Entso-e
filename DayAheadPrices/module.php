@@ -371,14 +371,13 @@ class DayAheadPrices extends IPSModule {
 		}
 
 		for($idx=$lowestIdx;$idx<$lowestIdx+$Timeframe;$idx++) {
-			$lowestPrices[$idx] = $points[$idx];
+			$lowestPrices[$idx] = $points[$idx]/$divider*$rate*$vat;
 		}
 
 		$stats = $this->GetStats($lowestPrices);
 				
 		$result['interval'] = array('start'=>$lowestIdx, 'end'=>$lowestIdx+$Timeframe-1);
 		$result['prices'] = $lowestPrices;
-		//$result['statistics'] = $stats;
 		$result['statistics']['high'] = $stats->high/$divider*$rate*$vat;
 		$result['statistics']['low'] = $stats->low/$divider*$rate*$vat;
 		$result['statistics']['avg'] = $stats->avg/$divider*$rate*$vat;
