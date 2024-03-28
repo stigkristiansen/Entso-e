@@ -313,12 +313,15 @@ class DayAheadPrices extends IPSModule {
 		$this->SetTimerInterval('EntoseDayAheadRefresh' . (string)$this->InstanceID, (self::SecondsToNextHour()+1)*1000); 
 	}
 
-	private function GetStats($Prices) {
+	private function GetStats($Prices, $IncludeCurrent = true) {
 		$this->SendDebug(__FUNCTION__, 'Calculating statistics...', 0);
-		$date = new DateTime('Now');
-		$currentIndex = $date->format('G');
 		
-		$stats = array('current' => (float)$Prices[$currentIndex]);
+		if($IncludeCurrent) {
+			$date = new DateTime('Now');
+			$currentIndex = $date->format('G');
+		
+			$stats = array('current' => (float)$Prices[$currentIndex]);
+		}
 		
 		sort($Prices, SORT_NUMERIC);
 		
@@ -374,7 +377,7 @@ class DayAheadPrices extends IPSModule {
 			$lowestPrices[$idx] = $points[$idx]/$divider*$rate*$vat;
 		}
 
-		$stats = $this->GetStats($lowestPrices);
+		$stats = $this->GetStats($lowestPrices, false);
 				
 		$result['interval'] = array('start'=>$lowestIdx, 'end'=>$lowestIdx+$Timeframe-1);
 		$result['prices'] = $lowestPrices;
