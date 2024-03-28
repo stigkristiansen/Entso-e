@@ -341,6 +341,8 @@ class DayAheadPrices extends IPSModule {
 			throw new Exception('Invalid parameter "Timeframe". Timeframe must be grater than 0 and less than 25'); 
 		}
 
+		$this->SendDebug(IPS_GetName($this->InstanceID).':'.__FUNCTION__, 'Calculating the lowest price interval...', 0);
+
 		$prices = json_decode($this->ReadAttributeString('Prices'));
 		$points = $prices->Prices->Points;
 		
@@ -361,7 +363,11 @@ class DayAheadPrices extends IPSModule {
 			}
 		}
 
-		return array('StartHour'=>$lowestIdx, 'EndHour'=>$lowestIdx+$Timeframe-1);
+		$interval = array('StartHour'=>$lowestIdx, 'EndHour'=>$lowestIdx+$Timeframe-1);
+
+		$this->SendDebug(IPS_GetName($this->InstanceID).':'.__FUNCTION__, 'The lowest price interval is: ' . json_encode($interval), 0);
+
+		return $interval;
 
 	}
 
