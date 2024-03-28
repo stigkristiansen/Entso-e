@@ -357,7 +357,7 @@ class DayAheadPrices extends IPSModule {
 
 			if($tempSum < $lowestSum) {
 				$lowestSum = $tempSum;
-				$lowestIdx = $Idx;
+				$lowestIdx = $idx;
 			}
 		}
 
