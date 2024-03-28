@@ -364,7 +364,7 @@ class DayAheadPrices extends IPSModule {
 		}
 
 		for($idx=$lowestIdx;$idx<$lowestIdx+$Timeframe;$idx++) {
-			$lowestPrice[$idx] = $points[$idx]
+			$lowestPrice[$idx] = $points[$idx];
 		}
 		$interval = $lowestPrice;//array('StartHour'=>$lowestIdx, 'EndHour'=>$lowestIdx+$Timeframe-1);
 
