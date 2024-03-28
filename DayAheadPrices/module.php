@@ -344,6 +344,13 @@ class DayAheadPrices extends IPSModule {
 		$this->SendDebug(__FUNCTION__, 'Calculating the lowest price interval...', 0);
 
 		$prices = json_decode($this->ReadAttributeString('Prices'));
+		$rates =  json_decode($this->ReadAttributeString('Rates'));
+		
+		$factors = $this->GetFactors($prices, $rates);
+		$divider = $factors->Divider;
+		$rate = $factors->Rate;
+		$vat = 1 + $this->ReadPropertyInteger('VAT')/100;
+		
 		$points = $prices->Prices->Points;
 		
 		$lowestIdx = 0;
@@ -372,9 +379,9 @@ class DayAheadPrices extends IPSModule {
 		$result['interval'] = array('start'=>$lowestIdx, 'end'=>$lowestIdx+$Timeframe-1);
 		$result['prices'] = $lowestPrices;
 		//$result['statistics'] = $stats;
-		$result['statistics']['high'] = $stats->high;
-		$result['statistics']['low'] = $stats->low;
-		$result['statistics']['avg'] = $stats->avg;
+		$result['statistics']['high'] = $stats->high/$divider*$rate*$vat;
+		$result['statistics']['low'] = $stats->low/$divider*$rate*$vat
+		$result['statistics']['avg'] = $stats->avg/$divider*$rate*$vat;
 
 		$this->SendDebug(__FUNCTION__, sprintf('The lowest price interval is: %s', json_encode($result)), 0);
 
