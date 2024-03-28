@@ -30,7 +30,7 @@
         },
         {  
             "type":"Select", "name":"Area", "caption":"Area" , 
-            "options":[ 
+            "options":[     
                 {"caption":"NO1", "value":"10YNO-1--------2"}, 
                 {"caption":"NO2", "value":"10YNO-2--------T"}, 
                 {"caption":"NO3", "value":"10YNO-3--------J"}, 

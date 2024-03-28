@@ -291,8 +291,6 @@ class DayAheadPrices extends IPSModule {
 		return $fetchData;
 	}
 
-	
-
 	private function UpdateRates(object $Rates) {
 		$now = new DateTime('Now');
 		$today = $now->format('Y-m-d');
@@ -336,8 +334,35 @@ class DayAheadPrices extends IPSModule {
 		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Calculated statistics: %s', json_encode($stats)), 0);
 
 		return (object)$stats;
-		
 	}
 
+	public function GetIntervalWithLowestPrice(int $Timeframe) : array {
+		if($Timeframe < 1 || $Timeframe > 24) {
+			throw new Exception('Invalid parameter "Timeframe". Timeframe must be grater than 0 and less than 25'); 
+		}
+
+		$prices = json_decode($this->ReadAttributeString('Prices'));
+		$points = $prices->Prices->Points;
+		
+		$lowestIdx = 0;
+		$lowestSum = PHP_FLOAT_MAX;
+
+		for($idx=0;$idx<=24-$Timeframe; $idx++) {
+			$tempSum = 0;
+			$endIdx = $idx+$Timeframe;
+			
+			for($idx2=$idx;$idx2<$endIdx;$idx2++) {
+				$tempSum += $points[$idx2];
+			}
+
+			if($tempSum < $lowestSum) {
+				$lowestSum = $tempSum;
+				$lowestIdx = $Idx;
+			}
+		}
+
+		return array('StartHour'=>$lowestIdx, 'EndHour'=>$lowestIdx+$Timeframe-1);
+
+	}
 
 }

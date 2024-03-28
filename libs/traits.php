@@ -91,9 +91,7 @@ trait WebCall {
 
 trait Utility {
     protected function SecondsToNextHour() {
-        $date = new DateTime('Now');
-        $secSinceLastHour = $date->getTimestamp() % 3600; 
-        return (3600 - $secSinceLastHour);
+        return (3600 - (time() % 3600));
     }
 
     protected function GUID() {
