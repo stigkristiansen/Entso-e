@@ -34,7 +34,7 @@ class EntsoEGateway extends IPSModule {
 
 	public function RequestAction($Ident, $Value) {
 		try {
-			$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('ReqestAction called for Ident "%s" with Value %s', $Ident, $Value), 0);
+			$this->SendDebug(__FUNCTION__, sprintf('ReqestAction called for Ident "%s" with Value %s', $Ident, $Value), 0);
 
 			switch (strtolower($Ident)) {
 				case 'async':
@@ -45,18 +45,18 @@ class EntsoEGateway extends IPSModule {
 			}
 		} catch(Exception $e) {
 			$this->LogMessage(sprintf('RequestAction failed. The error was "%s"',  $e->getMessage()), KL_ERROR);
-			$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('RequestAction failed. The error was "%s"', $e->getMessage()), 0);
+			$this->SendDebug(__FUNCTION__, sprintf('RequestAction failed. The error was "%s"', $e->getMessage()), 0);
 		}
 	}
 
 	public function ForwardData($JSONString) {
-		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Received a request from a child. The request was "%s"', $JSONString), 0);
+		$this->SendDebug(__FUNCTION__, sprintf('Received a request from a child. The request was "%s"', $JSONString), 0);
 
 		$data = json_decode($JSONString);
 		$requests = json_encode($data->Buffer);
 		$script = "IPS_RequestAction(" . (string)$this->InstanceID . ", 'Async', '" . $requests . "');";
 
-		$this->SendDebug(IPS_GetName($this->InstanceID), 'Executing the request(s) in a new thread...', 0);
+		$this->SendDebug(__FUNCTION__, 'Executing the request(s) in a new thread...', 0);
 				
 		// Call RequestAction in another thread
 		IPS_RunScriptText($script);
@@ -112,7 +112,7 @@ class EntsoEGateway extends IPSModule {
 			}
 		} catch(Exception $e) {
 			$buffer = array('Error' => true, 'Message' => $e->getMessage());
-			$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('HandleAsyncRequest() failed. The error was "%s"', $e->getMessage()), 0);
+			$this->SendDebug(__FUNCTION__, sprintf('HandleAsyncRequest() failed. The error was "%s"', $e->getMessage()), 0);
 			if(isset($request->ChildId)) {
 				$requestId= isset($request->RequestId)?$request->RequestId:'Unknown';
 				$this->SendDataToChildren(json_encode(["DataID" => "{6E413DE8-C9F0-5E7F-4A69-07993C271FDC}", "ChildId" => $request->ChildId, "RequestId" => $requestId,"Buffer" => $buffer]));
@@ -121,7 +121,7 @@ class EntsoEGateway extends IPSModule {
 	}
 
 	private function GetDayAheadPricesGraph(array $Points, string $Date, string $File, string $ChildId, string $RequestId) {
-		$this->SendDebug(IPS_GetName($this->InstanceID), 'Downloading DayAheadPrices Graph...', 0);
+		$this->SendDebug(__FUNCTION__, 'Downloading DayAheadPrices Graph...', 0);
 		
 		$max = count($Points);
 		for($i=0;$i<$max;$i++) {
@@ -134,18 +134,18 @@ class EntsoEGateway extends IPSModule {
 
 		$url = self::GRAPHS_BASE_URL . '/chart?bkg=white&c=' . urlencode(json_encode($chart));
 
-		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('The url is "%s"', $url), 0);
+		$this->SendDebug(__FUNCTION__, sprintf('The url is "%s"', $url), 0);
 
 		$this->DownloadURL($url, urldecode($File));
 
-		$this->SendDebug(IPS_GetName($this->InstanceID), 'The graph was downloaded', 0);
+		$this->SendDebug(__FUNCTION__, 'The graph was downloaded', 0);
 
 		$return = array('Function' => 'GetDayAheadPricesGraph', 'File'=> $File);
 		$this->SendDataToChildren(json_encode(["DataID" => "{6E413DE8-C9F0-5E7F-4A69-07993C271FDC}", "ChildId" => $ChildId, "RequestId" => $RequestId,"Buffer" => $return]));
 	}
 
 	private function GetDayAheadPrices(string $Area, string $ChildId, string $RequestId) {
-		$this->SendDebug(IPS_GetName($this->InstanceID), 'Requesting Day-Ahead prices....', 0);
+		$this->SendDebug(__FUNCTION__, 'Requesting Day-Ahead prices....', 0);
 
 		$apiKey = $this->ReadPropertyString('ApiKey');
 		if(strlen($apiKey)==0) {
@@ -210,12 +210,12 @@ class EntsoEGateway extends IPSModule {
 		$return['Prices'] = $series;
 		$return['Rates'] = $this->GetExchangeRates($currency);
 				
-		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Returning day-Ahead Prices to requesting child with Ident %s. Result sent is %s...',  $ChildId, json_encode($return)), 0);
+		$this->SendDebug(__FUNCTION__, sprintf('Returning day-Ahead Prices to requesting child with Ident %s. Result sent is %s...',  $ChildId, json_encode($return)), 0);
 		$this->SendDataToChildren(json_encode(["DataID" => "{6E413DE8-C9F0-5E7F-4A69-07993C271FDC}", "ChildId" => $ChildId, "RequestId" => $RequestId,"Buffer" => $return]));
 	}
 
 	private function GetExchangeRates(string $Currency) { 
-		$this->SendDebug(IPS_GetName($this->InstanceID), 'Requesting Exchange rate....', 0);
+		$this->SendDebug(__FUNCTION__, 'Requesting Exchange rate....', 0);
 
 		$apiKey = $this->ReadPropertyString('RatesApiKey');
 		if(strlen($apiKey)==0) {
