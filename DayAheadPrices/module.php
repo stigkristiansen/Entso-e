@@ -367,7 +367,7 @@ class DayAheadPrices extends IPSModule {
 			$lowestPrices[$idx] = $points[$idx];
 		}
 
-		$stats = $this->GetStats($lowestPrice);
+		$stats = $this->GetStats($lowestPrices);
 		
 		$result['Interval'] = array('StartHour'=>$lowestIdx, 'EndHour'=>$lowestIdx+$Timeframe-1);
 		$result['Prices'] = $lowestPrices;
