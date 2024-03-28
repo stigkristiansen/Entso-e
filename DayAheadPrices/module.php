@@ -363,7 +363,10 @@ class DayAheadPrices extends IPSModule {
 			}
 		}
 
-		$interval = array('StartHour'=>$lowestIdx, 'EndHour'=>$lowestIdx+$Timeframe-1);
+		for($idx=$lowestIdx;$idx<$lowestIdx+$Timeframe;$idx++) {
+			$lowestPrice[$idx] = $points[$idx]
+		}
+		$interval = $lowestPrice;//array('StartHour'=>$lowestIdx, 'EndHour'=>$lowestIdx+$Timeframe-1);
 
 		$this->SendDebug(__FUNCTION__, sprintf('The lowest price interval is: %s', json_encode($interval)), 0);
 
