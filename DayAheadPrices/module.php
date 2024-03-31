@@ -355,6 +355,8 @@ class DayAheadPrices extends IPSModule {
 		$vat = 1 + $this->ReadPropertyInteger('VAT')/100;
 		
 		$points = $prices->Prices->Points;
+
+		$this->SendDebug(__FUNCTION__, sprintf('Hourly prices: %s', json_encode($points)), 0);
 		
 		$lowestIdx = 0;
 		$lowestSum = PHP_FLOAT_MAX;
