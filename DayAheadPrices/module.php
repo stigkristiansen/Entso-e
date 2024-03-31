@@ -340,14 +340,15 @@ class DayAheadPrices extends IPSModule {
 	}
 
 	public function GetIntervalWithLowestPrice(int $Timeframe) : array {
-		if($Timeframe < 1 || $Timeframe > 24) {
-			throw new Exception('Invalid parameter "Timeframe". Timeframe must be grater than 0 and less than 25'); 
+		if($Timeframe < 1 || $Timeframe > 8) {
+			throw new Exception('Invalid parameter "Timeframe". Timeframe must be grater than 0 and less than 9'); 
 		}
 
 		$this->SendDebug(__FUNCTION__, 'Calculating the lowest price interval...', 0);
 
 		$prices = json_decode($this->ReadAttributeString('Prices'));
 		$rates =  json_decode($this->ReadAttributeString('Rates'));
+
 		
 		$factors = $this->GetFactors($prices, $rates);
 		$divider = $factors->Divider;
