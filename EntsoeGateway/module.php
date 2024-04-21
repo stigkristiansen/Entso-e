@@ -133,7 +133,7 @@ class EntsoEGateway extends IPSModule {
 		$chart['data'] = array('labels' => $hours);
 		$chart['data']['datasets'] = array(array('label' => $Date, 'data' => $Points->{'today'}));
 		if(isset($Points->{'tomorrow'})) {
-			$chart['data']['datasets'][] = array('label' => 'Tomorrow', 'data' => $Points->{'tomorrow'})
+			$chart['data']['datasets'][] = array('label' => 'Tomorrow', 'data' => $Points->{'tomorrow'});
 		}
 		
 		//$chart['data']['datasets'] = array(array('label' => $Date, 'data' => $Points));
