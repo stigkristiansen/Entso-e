@@ -155,7 +155,7 @@ class EntsoEGateway extends IPSModule {
 		$midnight = new DateTime('today midnight');
 		$midnight->setTimezone(new DateTimeZone("UTC")); 
 		$periodStart = $midnight->format('YmdHi');
-		$midnight->add(new DateInterval('PT24H'));
+		$midnight->add(new DateInterval('PT48H'));
 		$periodEnd = $midnight->format('YmdHi');
 
 		$zone = $Area;
