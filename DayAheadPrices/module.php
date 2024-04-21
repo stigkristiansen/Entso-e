@@ -247,7 +247,7 @@ class DayAheadPrices extends IPSModule {
 				$price = $prices->Prices->Timeseries->{$tomorrow}[$i]->price;
 				$position = $prices->Prices->Timeseries->{$tomorrow}[$i]->position;
 
-				$tomorrowPoints[position-1] = $price/$divider*$rate*$vat;
+				$tomorrowPoints[$position-1] = $price/$divider*$rate*$vat;
 			}
 
 			ksort($tomorrowPoints);
