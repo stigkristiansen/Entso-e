@@ -225,7 +225,7 @@ class DayAheadPrices extends IPSModule {
 		$tomorrow = $date->format('Ymd');
 		
 		$newPoints = [];
-		
+
 		if(array_key_exists($today, $prices->Prices->Timeseries)) {
 			$max = count($prices->Prices->Timeseries[$today]);
 			for($i=0;$i<$max;$i++) {
@@ -314,7 +314,7 @@ class DayAheadPrices extends IPSModule {
 			$fetchData = true;
 		}
 
-		return $fetchData;
+		return true; //$fetchData;
 	}
 
 	private function UpdateRates(object $Rates) {
