@@ -194,6 +194,24 @@ class EntsoEGateway extends IPSModule {
 		$resolution = (string)$xml->{"TimeSeries"}->{"Period"}->{"resolution"};
 		$currency = (string)$xml->{"TimeSeries"}->{"currency_Unit.name"};
 		$priceMeasureUnitName = (string)$xml->{"TimeSeries"}->{"price_Measure_Unit.name"};
+
+		$timeseries = [];
+		$timezone = new DateTimeZone(date('e'));
+		
+		foreach($xml->{"TimeSeries"} as $xmlTimeserie) {
+			$date = new DateTime((string)$xmlTimeserie->{"Period"}->{"timeInterval"}->{"start"});
+			$date->setTimezone($timezone);
+
+			$points = [];
+			foreach($xmlTimeserie->{"Period"}->{"Point"} as $xmlPoint) {
+				$point = [];
+				$point["position"] = (int)$xmlPoint->{'position'};
+				$point["price"] = (float)((string)$xmlPoint->{"price.amount"});
+				$points[] = $point;
+			}     
+
+			$timeseries[$date->format('Ymd')] = $points;
+		}
 		
 		$points = [];
 		foreach($xml->{"TimeSeries"}->{"Period"}->{"Point"} as $point) {
@@ -204,6 +222,7 @@ class EntsoEGateway extends IPSModule {
 		$series['MeasureUnit'] = $priceMeasureUnitName;
 		$series['Resolution'] = $resolution;
 		$series['Points'] = $points;
+		$series['Timeseries'] = $timeseries;
 	
 		$return = array('Function' => 'GetDayAheadPrices');
 		$return['RequestId'] = $RequestId;
