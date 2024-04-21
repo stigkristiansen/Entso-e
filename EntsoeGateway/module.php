@@ -219,15 +219,15 @@ class EntsoEGateway extends IPSModule {
 			$timeseries[$date->format('Ymd')] = $points;
 		}
 		
-		$points = [];
-		foreach($xml->{"TimeSeries"}->{"Period"}->{"Point"} as $point) {
-			$points[] = (float)((string)$point->{"price.amount"});
-		}    
+		//$points = [];
+		//foreach($xml->{"TimeSeries"}->{"Period"}->{"Point"} as $point) {
+		//	$points[] = (float)((string)$point->{"price.amount"});
+		//}    
 		   
 		$series = array('Currency' => $currency);
 		$series['MeasureUnit'] = $priceMeasureUnitName;
 		$series['Resolution'] = $resolution;
-		$series['Points'] = $points;
+		//$series['Points'] = $points;
 		$series['Timeseries'] = $timeseries;
 	
 		$return = array('Function' => 'GetDayAheadPrices');
