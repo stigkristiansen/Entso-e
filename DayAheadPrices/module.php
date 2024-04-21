@@ -266,6 +266,22 @@ class DayAheadPrices extends IPSModule {
 		$divider = $factors->Divider;
 		$rate = $factors->Rate;
 		$vat = 1 + $this->ReadPropertyInteger('VAT')/100;
+		
+		$points = [];
+		$date = new DateTime('Now');
+		$today = $date->format('Ymd');
+
+		if(isset($prices->Prices->Timeseries->{$today})) {
+			$max = count($prices->Prices->Timeseries->{$today});
+			for($i=0;$i<$max;$i++) {
+				$price = $prices->Prices->Timeseries->{$today}[$i]->price;
+				$position = $prices->Prices->Timeseries->{$today}[$i]->Position;
+				
+				$points[$position] = $price/$divider*$rate*$vat;
+			}
+			
+			ksort($points);
+		}
 
 		$entsoeCurrency = $prices->Prices->Currency;
 		$this->SendDebug(__FUNCTION__, sprintf('Prices from Entso-e are reported in %s', $entsoeCurrency), 0);
@@ -278,7 +294,8 @@ class DayAheadPrices extends IPSModule {
 		
 		$this->SendDebug(__FUNCTION__, sprintf('Divider is: %s', (string)$divider), 0);
 		
-		$stats = $this->GetStats($prices->Prices->Points);
+		//$stats = $this->GetStats($prices->Prices->Points);
+		$stats = $this->GetStats($points);
 
 		$this->SendDebug(__FUNCTION__, 'Updating variables...', 0);
 		$this->SetValue('Current', $stats->current/$divider*$rate*$vat);
