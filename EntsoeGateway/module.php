@@ -104,7 +104,7 @@ class EntsoEGateway extends IPSModule {
 							throw new Exception(sprintf('Incoming request is invalid. Key "Date" is missing. The request was "%s"', $Requests));
 						}
 						
-						$this->GetDayAheadPricesGraph($request->NewPoints, $request->Date, $request->File, $childId, $requestId);
+						$this->GetDayAheadPricesGraph($request->Points, $request->Date, $request->File, $childId, $requestId);
 						break;
 					default:
 						throw new Exception(sprintf('Incoming request failed. Unknown function "%s"', $function));

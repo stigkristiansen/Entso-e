@@ -214,17 +214,17 @@ class DayAheadPrices extends IPSModule {
 		$rate = $factors->Rate;
 		$vat = 1 + $this->ReadPropertyInteger('VAT')/100;
 
-		$max = count($prices->Prices->Points);
-		for($i=0;$i<$max;$i++) {
-			$points[] = $prices->Prices->Points[$i]/$divider*$rate*$vat;
-		}
+		//$max = count($prices->Prices->Points);
+		//for($i=0;$i<$max;$i++) {
+		//	$points[] = $prices->Prices->Points[$i]/$divider*$rate*$vat;
+		//}
 
 		$date = new DateTime('Now');
 		$today = $date->format('Ymd');
 		$date->add(DateInterval::createFromDateString('1 day'));
 		$tomorrow = $date->format('Ymd');
 		
-		$newPoints = [];
+		$points = [];
 
 		if(isset($prices->Prices->Timeseries->{$today})) {
 			$max = count($prices->Prices->Timeseries->{$today});
@@ -233,7 +233,7 @@ class DayAheadPrices extends IPSModule {
 				$todayPoints[] = $price/$divider*$rate*$vat;
 			}
 
-			$newPoints['today'] = $todayPoints;	
+			$points['today'] = $todayPoints;	
 		}
 
 		
@@ -244,7 +244,7 @@ class DayAheadPrices extends IPSModule {
 				$tomorrowPoints[] = $price/$divider*$rate*$vat;
 			}
 
-			$newPoints['tomorrow'] = $tomorrowPoints;
+			$points['tomorrow'] = $tomorrowPoints;
 		}
 
 		$guid = self::GUID();
@@ -252,8 +252,9 @@ class DayAheadPrices extends IPSModule {
 
 		$now = new DateTime('Now');
 		$today = $now->format($this->ReadPropertyString('DateFormat'));
-				
-		$request[] = ['Function'=>'GetDayAheadPricesGraph', 'RequestId'=>$guid, 'ChildId'=>(string)$this->InstanceID, 'NewPoints'=>$newPoints,'Points'=>$points, 'File'=>$file, 'Date'=>$today];
+		
+		$request[] = ['Function'=>'GetDayAheadPricesGraph', 'RequestId'=>$guid, 'ChildId'=>(string)$this->InstanceID, 'Points'=>$points, 'File'=>$file, 'Date'=>$today];
+		//$request[] = ['Function'=>'GetDayAheadPricesGraph', 'RequestId'=>$guid, 'ChildId'=>(string)$this->InstanceID, 'NewPoints'=>$newPoints,'Points'=>$points, 'File'=>$file, 'Date'=>$today];
 		$this->SendDataToParent(json_encode(['DataID' => '{8ED8DB86-AFE5-57AD-D638-505C91A39397}', 'Buffer' => $request]));
 	}
 
