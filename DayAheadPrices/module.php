@@ -226,10 +226,10 @@ class DayAheadPrices extends IPSModule {
 		
 		$newPoints = [];
 
-		if(array_key_exists($today, $prices->Prices->Timeseries)) {
-			$max = count($prices->Prices->Timeseries[$today]);
+		if(isset($prices->Prices->Timeseries->{$today})) {
+			$max = count($prices->Prices->Timeseries->{$today});
 			for($i=0;$i<$max;$i++) {
-				$price = $prices->Prices->Timeseries[$today][$i]['price'];
+				$price = $prices->Prices->Timeseries->{$today}[$i]->price;
 				$todayPoints[] = $price/$divider*$rate*$vat;
 			}
 
@@ -237,10 +237,10 @@ class DayAheadPrices extends IPSModule {
 		}
 
 		
-		if(array_key_exists($tomorrow, $prices->Prices->Timeseries)) {
-			$max = count($prices->Prices->Timeseries[$tomorrow]);
+		if(isset($prices->Prices->Timeseries->{$tomorrow})) {
+			$max = count($prices->Prices->Timeseries->{$tomorrow});
 			for($i=0;$i<$max;$i++) {
-				$price = $prices->Prices->Timeseries[$tomorrow][$i]['price'];
+				$price = $prices->Prices->Timeseries->{$tomorrow}[$i]->price;
 				$tomorrowPoints[] = $price/$divider*$rate*$vat;
 			}
 
