@@ -230,8 +230,12 @@ class DayAheadPrices extends IPSModule {
 			$max = count($prices->Prices->Timeseries->{$today});
 			for($i=0;$i<$max;$i++) {
 				$price = $prices->Prices->Timeseries->{$today}[$i]->price;
-				$todayPoints[] = $price/$divider*$rate*$vat;
+				$position = $prices->Prices->Timeseries->{$today}[$i]->position;
+				
+				$todayPoints[$position-1] = $price/$divider*$rate*$vat;
 			}
+
+			ksort($todayPoints);
 
 			$points['today'] = $todayPoints;	
 		}
@@ -241,8 +245,12 @@ class DayAheadPrices extends IPSModule {
 			$max = count($prices->Prices->Timeseries->{$tomorrow});
 			for($i=0;$i<$max;$i++) {
 				$price = $prices->Prices->Timeseries->{$tomorrow}[$i]->price;
-				$tomorrowPoints[] = $price/$divider*$rate*$vat;
+				$position = $prices->Prices->Timeseries->{$tomorrow}[$i]->position;
+
+				$tomorrowPoints[position-1] = $price/$divider*$rate*$vat;
 			}
+
+			ksort($tomorrowPoints);
 
 			$points['tomorrow'] = $tomorrowPoints;
 		}
@@ -277,7 +285,7 @@ class DayAheadPrices extends IPSModule {
 				$price = $prices->Prices->Timeseries->{$today}[$i]->price;
 				$position = $prices->Prices->Timeseries->{$today}[$i]->position;
 				
-				$points[$position] = $price/$divider*$rate*$vat;
+				$points[$position-1] = $price/$divider*$rate*$vat;
 			}
 			
 			ksort($points);
