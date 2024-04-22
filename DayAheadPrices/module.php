@@ -308,16 +308,16 @@ class DayAheadPrices extends IPSModule {
 		//$this->SendDebug(__FUNCTION__, sprintf('Returned stats are: %s', json_encode($stats), 0);
 
 		$this->SendDebug(__FUNCTION__, 'Updating variables...', 0);
-		$this->SendDebug(__FUNCTION__, sprintf('Raw Current: %f', $stats->current), 0);
-		$this->SendDebug(__FUNCTION__, sprintf('Raw High: %f', $stats->high), 0);
-		$this->SendDebug(__FUNCTION__, sprintf('Raw Low: %f', $stats->low), 0);
-		$this->SendDebug(__FUNCTION__, sprintf('Raw Avg: %f', $stats->avg), 0);
-		$this->SendDebug(__FUNCTION__, sprintf('Raw Median: %d', $stats->median), 0);
-		$this->SetValue('Current', $stats->current/$divider*$rate*$vat);
-		$this->SetValue('High', $stats->high/$divider*$rate*$vat);
-		$this->SetValue('Low', $stats->low/$divider*$rate*$vat);
-		$this->SetValue('Avg', $stats->avg/$divider*$rate*$vat);
-		$this->SetValue('Median', $stats->median/$divider*$rate*$vat);
+		$this->SendDebug(__FUNCTION__, sprintf('Current: %f', $stats->current), 0);
+		$this->SendDebug(__FUNCTION__, sprintf('High: %f', $stats->high), 0);
+		$this->SendDebug(__FUNCTION__, sprintf('Low: %f', $stats->low), 0);
+		$this->SendDebug(__FUNCTION__, sprintf('Avg: %f', $stats->avg), 0);
+		$this->SendDebug(__FUNCTION__, sprintf('Median: %f', $stats->median), 0);
+		$this->SetValue('Current', $stats->current);
+		$this->SetValue('High', $stats->high);
+		$this->SetValue('Low', $stats->low);
+		$this->SetValue('Avg', $stats->avg);
+		$this->SetValue('Median', $stats->median);
 		
 	}
 
