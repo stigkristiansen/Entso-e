@@ -305,7 +305,7 @@ class DayAheadPrices extends IPSModule {
 		//$stats = $this->GetStats($prices->Prices->Points);
 		$stats = $this->GetStats($points);
 
-		$this->SendDebug(__FUNCTION__, sprintf('Returned stats are: %s', json_encode($stats), 0);
+		//$this->SendDebug(__FUNCTION__, sprintf('Returned stats are: %s', json_encode($stats), 0);
 
 		$this->SendDebug(__FUNCTION__, 'Updating variables...', 0);
 		$this->SetValue('Current', $stats->current/$divider*$rate*$vat);
