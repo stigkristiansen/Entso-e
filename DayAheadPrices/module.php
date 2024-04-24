@@ -143,7 +143,6 @@ class DayAheadPrices extends IPSModule {
 	}
 	
 	private function Refresh() {
-		//$this->SetTimerInterval('EntoseDayAheadRefresh' . (string)$this->InstanceID, 3600*1000);
 		$this->InitTimer();
 
 		$this->HandleData();
@@ -253,9 +252,6 @@ class DayAheadPrices extends IPSModule {
 		$guid = self::GUID();
 		$file = urlencode(__DIR__ . '/../../../media/DayAheadGraph.png');
 
-		//$now = new DateTime('Now');
-		//$today = $now->format($this->ReadPropertyString('DateFormat'));
-		
 		$request[] = ['Function'=>'GetDayAheadPricesGraph', 'RequestId'=>$guid, 'ChildId'=>(string)$this->InstanceID, 'Points'=>$points, 'File'=>$file];
 		$this->SendDataToParent(json_encode(['DataID' => '{8ED8DB86-AFE5-57AD-D638-505C91A39397}', 'Buffer' => $request]));
 	}
@@ -296,10 +292,7 @@ class DayAheadPrices extends IPSModule {
 		
 		$this->SendDebug(__FUNCTION__, sprintf('Divider is: %s', (string)$divider), 0);
 		
-		//$stats = $this->GetStats($prices->Prices->Points);
 		$stats = $this->GetStats($points);
-
-		//$this->SendDebug(__FUNCTION__, sprintf('Returned stats are: %s', json_encode($stats), 0);
 
 		$this->SendDebug(__FUNCTION__, 'Updating variables...', 0);
 		$this->SendDebug(__FUNCTION__, sprintf('Current: %f', $stats->current), 0);
@@ -312,7 +305,6 @@ class DayAheadPrices extends IPSModule {
 		$this->SetValue('Low', $stats->low);
 		$this->SetValue('Avg', $stats->avg);
 		$this->SetValue('Median', $stats->median);
-		
 	}
 
 	private function EvaluateAttribute(string $Name) {
@@ -417,7 +409,6 @@ class DayAheadPrices extends IPSModule {
 
 		$numberOfPoints = count($points);
 
-		//for($idx=0;$idx<=24-$Timeframe; $idx++) {
 		for($idx=0;$idx<=$numberOfPoints-$Timeframe; $idx++) {
 			$tempSum = 0;
 			$endIdx = $idx+$Timeframe;
