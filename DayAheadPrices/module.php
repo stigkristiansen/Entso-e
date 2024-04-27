@@ -313,6 +313,10 @@ class DayAheadPrices extends IPSModule {
 		$now = new DateTime('Now');
 		$today = $now->format('Y-m-d');
 
+		if(strtolower($Name)=='prices') {
+			return true;
+		}
+
 		$data = $this->ReadAttributeString($Name);
 		if(strlen($data)>0) {
 			$day = json_decode($data);
@@ -333,7 +337,7 @@ class DayAheadPrices extends IPSModule {
 			$fetchData = true;
 		}
 
-		return true; //$fetchData;
+		return $fetchData;
 	}
 
 	private function UpdateRates(object $Rates) {
