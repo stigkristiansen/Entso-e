@@ -394,6 +394,10 @@ class DayAheadPrices extends IPSModule {
 		$prices = json_decode($this->ReadAttributeString('Prices'));
 		$rates =  json_decode($this->ReadAttributeString('Rates'));
 
+		$points = [];
+		$date = new DateTime('Now');
+		$today = $date->format('Ymd');
+
 		if(isset($prices->Prices->Timeseries->{$today})) {
 			$max = count($prices->Prices->Timeseries->{$today});
 			for($i=0;$i<$max;$i++) {
@@ -404,6 +408,8 @@ class DayAheadPrices extends IPSModule {
 			}
 			
 			ksort($points);
+		} else {
+			return $points;
 		}
 		
 		//$points = $prices->Prices->Points;
