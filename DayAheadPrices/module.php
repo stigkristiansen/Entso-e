@@ -415,6 +415,8 @@ class DayAheadPrices extends IPSModule {
 		//$points = $prices->Prices->Points;
 
 		$this->SendDebug(__FUNCTION__, sprintf('Hourly prices: %s', json_encode($points)), 0);
+
+		$this->SendDebug(__FUNCTION__, sprintf('Searching for lowest price interval for %d hours', $Timeframe), 0);
 				
 		$lowestIdx = 0;
 		$lowestSum = PHP_FLOAT_MAX;
