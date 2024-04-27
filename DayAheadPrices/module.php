@@ -204,7 +204,7 @@ class DayAheadPrices extends IPSModule {
 		return (object)array('Divider'=>$divider, 'Rate'=>$rate);
 	}
 
-	public function UpdateGraph() {
+	private function UpdateGraph() {
 		$prices = json_decode($this->ReadAttributeString('Prices'));
 		$rates =  json_decode($this->ReadAttributeString('Rates'));
 		
