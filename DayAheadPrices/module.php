@@ -308,14 +308,14 @@ class DayAheadPrices extends IPSModule {
 	}
 
 	private function EvaluateAttribute(string $Name) {
+		if(strtolower($Name)=='prices') {
+			return true;
+		}
+
 		$fetchData = false;
 
 		$now = new DateTime('Now');
 		$today = $now->format('Y-m-d');
-
-		if(strtolower($Name)=='prices') {
-			return true;
-		}
 
 		$data = $this->ReadAttributeString($Name);
 		if(strlen($data)>0) {
