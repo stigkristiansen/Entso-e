@@ -394,13 +394,19 @@ class DayAheadPrices extends IPSModule {
 		$prices = json_decode($this->ReadAttributeString('Prices'));
 		$rates =  json_decode($this->ReadAttributeString('Rates'));
 
+		if(isset($prices->Prices->Timeseries->{$today})) {
+			$max = count($prices->Prices->Timeseries->{$today});
+			for($i=0;$i<$max;$i++) {
+				$price = $prices->Prices->Timeseries->{$today}[$i]->price;
+				$position = $prices->Prices->Timeseries->{$today}[$i]->position;
+				
+				$points[$position-1] = $price;
+			}
+			
+			ksort($points);
+		}
 		
-		$factors = $this->GetFactors($prices, $rates);
-		$divider = $factors->Divider;
-		$rate = $factors->Rate;
-		$vat = 1 + $this->ReadPropertyInteger('VAT')/100;
-		
-		$points = $prices->Prices->Points;
+		//$points = $prices->Prices->Points;
 
 		$this->SendDebug(__FUNCTION__, sprintf('Hourly prices: %s', json_encode($points)), 0);
 				
@@ -422,6 +428,11 @@ class DayAheadPrices extends IPSModule {
 				$lowestIdx = $idx;
 			}
 		}
+
+		$factors = $this->GetFactors($prices, $rates);
+		$divider = $factors->Divider;
+		$rate = $factors->Rate;
+		$vat = 1 + $this->ReadPropertyInteger('VAT')/100;
 
 		for($idx=$lowestIdx;$idx<$lowestIdx+$Timeframe;$idx++) {
 			$lowestPrices[$idx] = $points[$idx]/$divider*$rate*$vat;
