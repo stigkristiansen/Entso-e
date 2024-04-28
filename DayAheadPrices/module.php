@@ -343,7 +343,7 @@ class DayAheadPrices extends IPSModule {
 			$fetchData = true;
 		}
 
-		$this->SendDebug(__FUNCTION__, sprintf('Evaluation of attribute "%s" is always set to %s', $Name, $fetchData?'TRUE':'FALSE'), 0);
+		$this->SendDebug(__FUNCTION__, sprintf('Evaluation of attribute "%s" is set to %s', $Name, $fetchData?'TRUE':'FALSE'), 0);
 
 		return $fetchData;
 	}
