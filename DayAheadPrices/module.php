@@ -170,9 +170,10 @@ class DayAheadPrices extends IPSModule {
 
 		if($fetchPrices||$fetchRates||$fetchGraph) {
 			$this->RequestData($fetchPrices, $fetchRates);
-		} else {
-			$this->UpdateVariables();
-		}
+		} 
+		
+		$this->UpdateVariables();
+		
 	}
 
 	private function GetFactors($Prices, $Rates) {
