@@ -89,7 +89,15 @@ class EntsoEGateway extends IPSModule {
 							throw new Exception(sprintf('Incoming request is invalid. Key "Area" is missing. The request was "%s"', $Requests));
 						}
 
-						$this->GetDayAheadPrices($request->Area, $childId, $requestId);
+						if(!isset($request->FetchPrices)) {
+							throw new Exception(sprintf('Incoming request is invalid. Key "FetchPrices" is missing. The request was "%s"', $Requests));
+						}
+
+						if(!isset($request->FetchRates)) {
+							throw new Exception(sprintf('Incoming request is invalid. Key "FetchRates" is missing. The request was "%s"', $Requests));
+						}
+
+						$this->GetDayAheadPrices($request->Area, $request->FetchPrices, $request->FetchRates, $childId, $requestId);
 						break;
 					case 'getdayaheadpricesgraph':
 						if(!isset($request->Points)) {
@@ -143,90 +151,96 @@ class EntsoEGateway extends IPSModule {
 		$this->SendDataToChildren(json_encode(["DataID" => "{6E413DE8-C9F0-5E7F-4A69-07993C271FDC}", "ChildId" => $ChildId, "RequestId" => $RequestId,"Buffer" => $return]));
 	}
 
-	private function GetDayAheadPrices(string $Area, string $ChildId, string $RequestId) {
+	private function GetDayAheadPrices(string $Area, bool $FetchPrices, bool, $FetchRates, string $ChildId, string $RequestId) {
 		$this->SendDebug(__FUNCTION__, 'Requesting Day-Ahead prices....', 0);
 
-		$apiKey = $this->ReadPropertyString('ApiKey');
-		if(strlen($apiKey)==0) {
-			throw new Exception('Missing API key for Entso-e');
-		}
-
-		$midnight = new DateTime('today midnight');
-		$midnight->setTimezone(new DateTimeZone("UTC")); 
-		$periodStart = $midnight->format('YmdHi');
-		$midnight->add(new DateInterval('PT48H'));
-		$periodEnd = $midnight->format('YmdHi');
-
-		$zone = $Area;
-		$params = array('securityToken' => $apiKey);
-		$params['in_Domain'] = $zone;
-		$params['out_Domain'] = $zone;
-		$params['periodStart'] = $periodStart;
-		$params['periodEnd'] = $periodEnd;
-		$params['documentType'] = 'A44';
-
-		$result = $this->Request('get', self::DAY_AHEAD_BASE_URL, $params);
-
-		if($result->success==false) {
-			throw new Exception(sprintf('Failed to call Entso-e. The error was %s:%s', (string)$result->httpcode, $result->errortext));
-		}
-
-		$xml = simplexml_load_string($result->result);
-
-		if(!isset($xml->{"TimeSeries"}->{"currency_Unit.name"})) {
-			throw new Exception('Failed to call Entso-e. Invalid data, missing "TimeSeries"');
-		}
-		
-		if(!isset($xml->{"TimeSeries"}->{"price_Measure_Unit.name"})) {
-			throw new Exception('Failed to call Entso-e. Invalid data, missing "price_Measure_Unit.name"');
-		}
-
-		if(!isset($xml->{"TimeSeries"}->{"Period"}->{"resolution"})) {
-			throw new Exception('Failed to call Entso-e. Invalid data, missing "resolution"');
-		}
-		
-		if(!isset($xml->{"TimeSeries"}->{"Period"}->{"Point"})) {
-			throw new Exception('Failed to call Entso-e. Invalid data, missing "Point"');
-		}
-
-
-		$resolution = (string)$xml->{"TimeSeries"}->{"Period"}->{"resolution"};
-		$currency = (string)$xml->{"TimeSeries"}->{"currency_Unit.name"};
-		$priceMeasureUnitName = (string)$xml->{"TimeSeries"}->{"price_Measure_Unit.name"};
-
-		$timeseries = [];
-		$timezone = new DateTimeZone(date('e'));
-		
-		foreach($xml->{"TimeSeries"} as $xmlTimeserie) {
-			$date = new DateTime((string)$xmlTimeserie->{"Period"}->{"timeInterval"}->{"start"});
-			$date->setTimezone($timezone);
-
-			$points = [];
-			foreach($xmlTimeserie->{"Period"}->{"Point"} as $xmlPoint) {
-				$point = [];
-				$point["position"] = (int)$xmlPoint->{'position'};
-				$point["price"] = (float)((string)$xmlPoint->{"price.amount"});
-				$points[] = $point;
-			}     
-
-			$timeseries[$date->format('Ymd')] = $points;
-		}
-		
-		$points = [];
-		foreach($xml->{"TimeSeries"}->{"Period"}->{"Point"} as $point) {
-			$points[] = (float)((string)$point->{"price.amount"});
-		}    
-		   
-		$series = array('Currency' => $currency);
-		$series['MeasureUnit'] = $priceMeasureUnitName;
-		$series['Resolution'] = $resolution;
-		$series['Points'] = $points;
-		$series['Timeseries'] = $timeseries;
-	
 		$return = array('Function' => 'GetDayAheadPrices');
 		$return['RequestId'] = $RequestId;
-		$return['Prices'] = $series;
-		$return['Rates'] = $this->GetExchangeRates($currency);
+		
+		if($FetchPrices) {
+			$apiKey = $this->ReadPropertyString('ApiKey');
+			if(strlen($apiKey)==0) {
+				throw new Exception('Missing API key for Entso-e');
+			}
+	
+			$midnight = new DateTime('today midnight');
+			$midnight->setTimezone(new DateTimeZone("UTC")); 
+			$periodStart = $midnight->format('YmdHi');
+			$midnight->add(new DateInterval('PT48H'));
+			$periodEnd = $midnight->format('YmdHi');
+	
+			$zone = $Area;
+			$params = array('securityToken' => $apiKey);
+			$params['in_Domain'] = $zone;
+			$params['out_Domain'] = $zone;
+			$params['periodStart'] = $periodStart;
+			$params['periodEnd'] = $periodEnd;
+			$params['documentType'] = 'A44';
+	
+			$result = $this->Request('get', self::DAY_AHEAD_BASE_URL, $params);
+	
+			if($result->success==false) {
+				throw new Exception(sprintf('Failed to call Entso-e. The error was %s:%s', (string)$result->httpcode, $result->errortext));
+			}
+	
+			$xml = simplexml_load_string($result->result);
+	
+			if(!isset($xml->{"TimeSeries"}->{"currency_Unit.name"})) {
+				throw new Exception('Failed to call Entso-e. Invalid data, missing "TimeSeries"');
+			}
+			
+			if(!isset($xml->{"TimeSeries"}->{"price_Measure_Unit.name"})) {
+				throw new Exception('Failed to call Entso-e. Invalid data, missing "price_Measure_Unit.name"');
+			}
+	
+			if(!isset($xml->{"TimeSeries"}->{"Period"}->{"resolution"})) {
+				throw new Exception('Failed to call Entso-e. Invalid data, missing "resolution"');
+			}
+			
+			if(!isset($xml->{"TimeSeries"}->{"Period"}->{"Point"})) {
+				throw new Exception('Failed to call Entso-e. Invalid data, missing "Point"');
+			}
+	
+	
+			$resolution = (string)$xml->{"TimeSeries"}->{"Period"}->{"resolution"};
+			$currency = (string)$xml->{"TimeSeries"}->{"currency_Unit.name"};
+			$priceMeasureUnitName = (string)$xml->{"TimeSeries"}->{"price_Measure_Unit.name"};
+	
+			$timeseries = [];
+			$timezone = new DateTimeZone(date('e'));
+			
+			foreach($xml->{"TimeSeries"} as $xmlTimeserie) {
+				$date = new DateTime((string)$xmlTimeserie->{"Period"}->{"timeInterval"}->{"start"});
+				$date->setTimezone($timezone);
+	
+				$points = [];
+				foreach($xmlTimeserie->{"Period"}->{"Point"} as $xmlPoint) {
+					$point = [];
+					$point["position"] = (int)$xmlPoint->{'position'};
+					$point["price"] = (float)((string)$xmlPoint->{"price.amount"});
+					$points[] = $point;
+				}     
+	
+				$timeseries[$date->format('Ymd')] = $points;
+			}
+			
+			$points = [];
+			foreach($xml->{"TimeSeries"}->{"Period"}->{"Point"} as $point) {
+				$points[] = (float)((string)$point->{"price.amount"});
+			}    
+			   
+			$series = array('Currency' => $currency);
+			$series['MeasureUnit'] = $priceMeasureUnitName;
+			$series['Resolution'] = $resolution;
+			$series['Points'] = $points;
+			$series['Timeseries'] = $timeseries;
+
+			$return['Prices'] = $series;
+		}
+
+		if($FetchRates) {
+			$return['Rates'] = $this->GetExchangeRates($currency);
+		}
 				
 		$this->SendDebug(__FUNCTION__, sprintf('Returning day-Ahead Prices to requesting child with Ident %s. Result sent is %s...',  $ChildId, json_encode($return)), 0);
 		$this->SendDataToChildren(json_encode(["DataID" => "{6E413DE8-C9F0-5E7F-4A69-07993C271FDC}", "ChildId" => $ChildId, "RequestId" => $RequestId,"Buffer" => $return]));

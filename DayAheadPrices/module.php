@@ -114,12 +114,16 @@ class DayAheadPrices extends IPSModule {
 			$function = strtolower($data->Buffer->Function);
 			switch($function) {
 				case 'getdayaheadprices':
-					$prices = $data->Buffer->Prices;
-					$rates = $data->Buffer->Rates;
-					$this->UpdatePrices($prices);
-					$this->UpdateRates($rates);
-					$this->UpdateVariables();
+					if(isset($data->Buffer->Prices)) {
+						$this->UpdatePrices($data->Buffer->Prices);
+					}
+
+					if(isset($data->Buffer->Rates)) {
+						$this->UpdateRates($data->Buffer->Rates);	
+					}
+					
 					$this->UpdateGraph();
+					
 					$this->SendDebug(__FUNCTION__, 'GetDayAheadPrices completed successfully', 0);
 					return;
 				case 'getdayaheadpricesgraph':
@@ -148,12 +152,13 @@ class DayAheadPrices extends IPSModule {
 		$this->HandleData();
 	}
 
-	private function RequestData() {
+	private function RequestData(bool $FetchPrices, bool $FetchRates) {
 		$guid = self::GUID();
 		$request = [];
 	
 		$area = $this->ReadPropertyString('Area');
-		$request[] = ['Function'=>'GetDayAheadPrices', 'RequestId'=>$guid, 'ChildId'=>(string)$this->InstanceID, 'Area'=>$area];
+		$request[] = ['Function'=>'GetDayAheadPrices', 'RequestId'=>$guid, 'ChildId'=>(string)$this->InstanceID,
+					  'Area'=>$area, 'FetchPrices'=>$FetchPrices, 'FetchRates'=>$FetchRates];
 	
 		$this->SendDataToParent(json_encode(['DataID' => '{8ED8DB86-AFE5-57AD-D638-505C91A39397}', 'Buffer' => $request]));
 	}
@@ -164,7 +169,7 @@ class DayAheadPrices extends IPSModule {
 		$fetchGraph =  !file_exists(__DIR__ . '/../../../media/DayAheadGraph.png');
 
 		if($fetchPrices||$fetchRates||$fetchGraph) {
-			$this->RequestData();
+			$this->RequestData($fetchPrices, $fetchRates);
 		} else {
 			$this->UpdateVariables();
 		}
