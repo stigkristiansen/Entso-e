@@ -314,6 +314,7 @@ class DayAheadPrices extends IPSModule {
 
 	private function EvaluateAttribute(string $Name) {
 		if(strtolower($Name)=='prices') {
+			$this->SendDebug(__FUNCTION__, sprintf('Evaluation of data in attribute "%s" is always set to TRUE', $Name), 0);
 			return true;
 		}
 
