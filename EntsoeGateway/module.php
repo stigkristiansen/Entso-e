@@ -151,7 +151,7 @@ class EntsoEGateway extends IPSModule {
 		$this->SendDataToChildren(json_encode(["DataID" => "{6E413DE8-C9F0-5E7F-4A69-07993C271FDC}", "ChildId" => $ChildId, "RequestId" => $RequestId,"Buffer" => $return]));
 	}
 
-	private function GetDayAheadPrices(string $Area, bool $FetchPrices, bool, $FetchRates, string $ChildId, string $RequestId) {
+	private function GetDayAheadPrices(string $Area, bool $FetchPrices, bool $FetchRates, string $ChildId, string $RequestId) {
 		$this->SendDebug(__FUNCTION__, 'Requesting Day-Ahead prices....', 0);
 
 		$return = array('Function' => 'GetDayAheadPrices');
