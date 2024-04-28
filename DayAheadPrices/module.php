@@ -122,6 +122,7 @@ class DayAheadPrices extends IPSModule {
 						$this->UpdateRates($data->Buffer->Rates);	
 					}
 					
+					$this->UpdateVariables();
 					$this->UpdateGraph();
 					
 					$this->SendDebug(__FUNCTION__, 'GetDayAheadPrices completed successfully', 0);
@@ -171,9 +172,6 @@ class DayAheadPrices extends IPSModule {
 		if($fetchPrices||$fetchRates||$fetchGraph) {
 			$this->RequestData($fetchPrices, $fetchRates);
 		} 
-		
-		$this->UpdateVariables();
-		
 	}
 
 	private function GetFactors($Prices, $Rates) {
