@@ -146,12 +146,27 @@ class DayAheadPrices extends IPSModule {
 		$this->SendDebug(__FUNCTION__, 'Invalid data received from parent', 0);
 
 	}
-	
+
+	private function InitTimer() {
+		$this->SetTimerInterval('EntoseDayAheadRefresh' . (string)$this->InstanceID, (self::SecondsToNextHour()+1)*1000); 
+	}
+
 	private function Refresh() {
 		$this->InitTimer();
 
 		$this->HandleData();
 	}
+
+	private function HandleData() {
+		$fetchPrices = $this->EvaluateAttribute('Prices');
+		$fetchRates  = $this->EvaluateAttribute('Rates');
+		$fetchGraph =  !file_exists(__DIR__ . '/../../../media/DayAheadGraph.png');
+
+		if($fetchPrices||$fetchRates||$fetchGraph) {
+			$this->RequestData($fetchPrices, $fetchRates);
+		} 
+	}
+	
 
 	private function RequestData(bool $FetchPrices, bool $FetchRates) {
 		$guid = self::GUID();
@@ -164,15 +179,7 @@ class DayAheadPrices extends IPSModule {
 		$this->SendDataToParent(json_encode(['DataID' => '{8ED8DB86-AFE5-57AD-D638-505C91A39397}', 'Buffer' => $request]));
 	}
 
-	private function HandleData() {
-		$fetchPrices = $this->EvaluateAttribute('Prices');
-		$fetchRates  = $this->EvaluateAttribute('Rates');
-		$fetchGraph =  !file_exists(__DIR__ . '/../../../media/DayAheadGraph.png');
 
-		if($fetchPrices||$fetchRates||$fetchGraph) {
-			$this->RequestData($fetchPrices, $fetchRates);
-		} 
-	}
 
 	private function GetFactors($Prices, $Rates) {
 		switch(strtolower($Prices->Prices->MeasureUnit)) {
@@ -365,9 +372,7 @@ class DayAheadPrices extends IPSModule {
 		$this->WriteAttributeString('Prices', json_encode($prices));
 	}
 
-	private function InitTimer() {
-		$this->SetTimerInterval('EntoseDayAheadRefresh' . (string)$this->InstanceID, (self::SecondsToNextHour()+1)*1000); 
-	}
+
 
 	private function GetStats($Prices, $IncludeCurrent = true) {
 		$this->SendDebug(__FUNCTION__, 'Calculating statistics...', 0);

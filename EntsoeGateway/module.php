@@ -232,7 +232,7 @@ class EntsoEGateway extends IPSModule {
 			$series = array('Currency' => $currency);
 			$series['MeasureUnit'] = $priceMeasureUnitName;
 			$series['Resolution'] = $resolution;
-			$series['Points'] = $points;
+			//$series['Points'] = $points;
 			$series['Timeseries'] = $timeseries;
 
 			$return['Prices'] = $series;
