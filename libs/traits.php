@@ -45,7 +45,7 @@ trait WebCall {
 			$response['success'] = false;
 			$response['errortext'] = curl_error($ch);
 
-			$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Call failed. The error was %s: %s', $response['httpcode'], $responce['errortext'] ), 0);
+			$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Call failed. The error was %s: %s', $response['httpcode'], $response['errortext'] ), 0);
 
 			return (object)$response;
 		} 
