@@ -129,7 +129,8 @@ class EntsoEGateway extends IPSModule {
 		
 		$this->SendDebug(__FUNCTION__, sprintf('Points: %s', json_encode($Points)), 0);
 
-		$max = count($Points->{'today'});
+		//$max = count($Points->{'today'});
+		$max=23;
 		for($i=0;$i<$max;$i++) {
 			$hours[]=$i;
 		}
@@ -222,7 +223,7 @@ class EntsoEGateway extends IPSModule {
 					$point["price"] = (float)((string)$xmlPoint->{"price.amount"});
 					$points[] = $point;
 
-					
+
 				}     
 	
 				$timeseries[$date->format('Ymd')] = $points;
