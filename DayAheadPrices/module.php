@@ -458,6 +458,7 @@ class DayAheadPrices extends IPSModule {
 		$rate = $factors->Rate;
 		$vat = 1 + $this->ReadPropertyInteger('VAT')/100;
 
+		$lowestPrices = [];
 		for($idx=$lowestIdx;$idx<$lowestIdx+$Timeframe;$idx++) {
 			$lowestPrices[$idx] = $points[$idx]/$divider*$rate*$vat;
 		}
