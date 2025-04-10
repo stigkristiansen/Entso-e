@@ -221,6 +221,8 @@ class EntsoEGateway extends IPSModule {
 					$point["position"] = (int)$xmlPoint->{'position'};
 					$point["price"] = (float)((string)$xmlPoint->{"price.amount"});
 					$points[] = $point;
+
+					
 				}     
 	
 				$timeseries[$date->format('Ymd')] = $points;
