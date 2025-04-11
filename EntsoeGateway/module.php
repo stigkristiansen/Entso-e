@@ -67,7 +67,6 @@ class EntsoEGateway extends IPSModule {
 	private function HandleAsyncRequest(string $Requests) {
 		$requests = json_decode($Requests);
 
-
 		try {
 			foreach($requests as $request) {
 			

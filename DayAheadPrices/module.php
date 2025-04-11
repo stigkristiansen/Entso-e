@@ -237,29 +237,28 @@ class DayAheadPrices extends IPSModule {
 				$price = $prices->Prices->Timeseries->{$today}[$i]->price;
 				$position = $prices->Prices->Timeseries->{$today}[$i]->position;
 				
-				//$todayPoints[$position-1] = $price/$divider*$rate*$vat;
-				$todayPoints[] = $price/$divider*$rate*$vat;
+				$todayPoints[$position-1] = $price/$divider*$rate*$vat;
+				//$todayPoints[] = $price/$divider*$rate*$vat;
 			}
 
 			ksort($todayPoints);
 
-			$points['today'] = $todayPoints;	
+			$points['today'] = array_values($todayPoints);	
 		}
 
-		
 		if(isset($prices->Prices->Timeseries->{$tomorrow})) {
 			$max = count($prices->Prices->Timeseries->{$tomorrow});
 			for($i=0;$i<$max;$i++) {
 				$price = $prices->Prices->Timeseries->{$tomorrow}[$i]->price;
 				$position = $prices->Prices->Timeseries->{$tomorrow}[$i]->position;
 
-				//$tomorrowPoints[$position-1] = $price/$divider*$rate*$vat;
-				$tomorrowPoints[] = $price/$divider*$rate*$vat;
+				$tomorrowPoints[$position-1] = $price/$divider*$rate*$vat;
+				//$tomorrowPoints[] = $price/$divider*$rate*$vat;
 			}
 
 			ksort($tomorrowPoints);
 
-			$points['tomorrow'] = $tomorrowPoints;
+			$points['tomorrow'] = array_values($tomorrowPoints);
 		}
 
 		$guid = self::GUID();
