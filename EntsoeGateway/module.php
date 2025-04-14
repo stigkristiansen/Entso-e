@@ -202,14 +202,30 @@ class EntsoEGateway extends IPSModule {
 			if(!isset($xml->{"TimeSeries"}->{"Period"}->{"Point"})) {
 				throw new Exception('Failed to call Entso-e. Invalid data, missing "Point"');
 			}
-	
-	
+		
 			$resolution = (string)$xml->{"TimeSeries"}->{"Period"}->{"resolution"};
 			$currency = (string)$xml->{"TimeSeries"}->{"currency_Unit.name"};
 			$priceMeasureUnitName = (string)$xml->{"TimeSeries"}->{"price_Measure_Unit.name"};
 	
 			$timeseries = [];
 			$timezone = new DateTimeZone(date('e'));
+
+			switch(strtoupper($resolution)) {
+				case 'PT60M':
+					$increment = 1;
+					break;
+				case 'PT30M':
+					$increment = 2;
+					break;
+				case 'PT15M':
+					$increment = 4;
+					break;
+				default:
+					
+			}
+			
+			$position = 1;
+			$points = [];
 			
 			foreach($xml->{"TimeSeries"} as $xmlTimeserie) {
 				$date = new DateTime((string)$xmlTimeserie->{"Period"}->{"timeInterval"}->{"start"});
@@ -217,15 +233,18 @@ class EntsoEGateway extends IPSModule {
 	
 				$points = [];
 				foreach($xmlTimeserie->{"Period"}->{"Point"} as $xmlPoint) {
-					$point = [];
-					$point["position"] = (int)$xmlPoint->{'position'};
-					$point["price"] = (float)((string)$xmlPoint->{"price.amount"});
-					$points[] = $point;
+					if((int)$xmlPoint->{'position'}==$position) {
+						$point = [];
+						$point["position"] = $position;
+						$point["price"] = (float)((string)$xmlPoint->{"price.amount"});
+						$points[] = $point;
 
-
+						$position+=$increment;
+					}
 				}     
 	
 				$timeseries[$date->format('Ymd')] = $points;
+
 			}
 			
 			$series = array('Currency' => $currency);
