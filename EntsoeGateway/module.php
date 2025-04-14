@@ -203,35 +203,36 @@ class EntsoEGateway extends IPSModule {
 				throw new Exception('Failed to call Entso-e. Invalid data, missing "Point"');
 			}
 		
-			$resolution = (string)$xml->{"TimeSeries"}->{"Period"}->{"resolution"};
+			
 			$currency = (string)$xml->{"TimeSeries"}->{"currency_Unit.name"};
 			$priceMeasureUnitName = (string)$xml->{"TimeSeries"}->{"price_Measure_Unit.name"};
 	
 			$timeseries = [];
 			$timezone = new DateTimeZone(date('e'));
-
-			switch(strtoupper($resolution)) {
-				case 'PT60M':
-					$increment = 1;
-					break;
-				case 'PT30M':
-					$increment = 2;
-					break;
-				case 'PT15M':
-					$increment = 4;
-					break;
-				default:
-					
-			}
-			
-			$position = 1;
-			$points = [];
 			
 			foreach($xml->{"TimeSeries"} as $xmlTimeserie) {
 				$date = new DateTime((string)$xmlTimeserie->{"Period"}->{"timeInterval"}->{"start"});
 				$date->setTimezone($timezone);
-	
+
+				$resolution = (string)$xml->{"TimeSeries"}->{"Period"}->{"resolution"};
+
+				switch(strtoupper($resolution)) {
+					case 'PT60M':
+						$increment = 1;
+						break;
+					case 'PT30M':
+						$increment = 2;
+						break;
+					case 'PT15M':
+						$increment = 4;
+						break;
+					default:
+						throw new Exception(sprintf('The resolution "%s" is not supported', $resolution));
+				}
+
+				$position = 1;
 				$points = [];
+
 				foreach($xmlTimeserie->{"Period"}->{"Point"} as $xmlPoint) {
 					if((int)$xmlPoint->{'position'}==$position) {
 						$point = [];
