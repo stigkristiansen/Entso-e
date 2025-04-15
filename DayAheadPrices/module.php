@@ -220,7 +220,9 @@ class DayAheadPrices extends IPSModule {
 		$prices = json_decode($this->ReadAttributeString('Prices'));
 		$rates =  json_decode($this->ReadAttributeString('Rates'));
 		
-		$factors = $this->GetFactors($prices, $rates);
+		
+		//$factors = $this->GetFactors($prices, $rates);
+		$factors = $this->GetFactors($prices->Prices->Timeseries->{$today}, $rates);
 		$divider = $factors->Divider;
 		$rate = $factors->Rate;
 		$vat = 1 + $this->ReadPropertyInteger('VAT')/100;
@@ -232,11 +234,12 @@ class DayAheadPrices extends IPSModule {
 		
 		$points = [];
 
-		if(isset($prices->Prices->Timeseries->{$today})) {
-			$max = count($prices->Prices->Timeseries->{$today});
+		//if(isset($prices->Prices->Timeseries->{$today})) {
+		if(isset($prices->Prices->Timeseries->{$today}->Points)) {
+			$max = count($prices->Prices->Timeseries->{$today}->Points);
 			for($i=0;$i<$max;$i++) {
-				$price = $prices->Prices->Timeseries->{$today}[$i]->price;
-				$position = $prices->Prices->Timeseries->{$today}[$i]->position;
+				$price = $prices->Prices->Timeseries->{$today}->Points[$i]->price;
+				$position = $prices->Prices->Timeseries->{$today}->Points[$i]->position;
 				
 				$todayPoints[$position-1] = $price/$divider*$rate*$vat;
 				//$todayPoints[] = $price/$divider*$rate*$vat;
@@ -247,11 +250,12 @@ class DayAheadPrices extends IPSModule {
 			$points['today'] = array_values($todayPoints);	
 		}
 
-		if(isset($prices->Prices->Timeseries->{$tomorrow})) {
-			$max = count($prices->Prices->Timeseries->{$tomorrow});
+		//if(isset($prices->Prices->Timeseries->{$tomorrow})) {
+		if(isset($prices->Prices->Timeseries->{$tomorrow}->Points)) {
+			$max = count($prices->Prices->Timeseries->{$tomorrow}->Points);
 			for($i=0;$i<$max;$i++) {
-				$price = $prices->Prices->Timeseries->{$tomorrow}[$i]->price;
-				$position = $prices->Prices->Timeseries->{$tomorrow}[$i]->position;
+				$price = $prices->Prices->Timeseries->{$tomorrow}->Points[$i]->price;
+				$position = $prices->Prices->Timeseries->{$tomorrow->Points[$i]->position;
 
 				$tomorrowPoints[$position-1] = $price/$divider*$rate*$vat;
 				//$tomorrowPoints[] = $price/$divider*$rate*$vat;
