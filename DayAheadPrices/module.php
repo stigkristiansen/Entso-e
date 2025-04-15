@@ -220,17 +220,16 @@ class DayAheadPrices extends IPSModule {
 		$prices = json_decode($this->ReadAttributeString('Prices'));
 		$rates =  json_decode($this->ReadAttributeString('Rates'));
 		
+		$date = new DateTime('Now');
+		$today = $date->format('Ymd');
+		$date->add(DateInterval::createFromDateString('1 day'));
+		$tomorrow = $date->format('Ymd');
 		
 		//$factors = $this->GetFactors($prices, $rates);
 		$factors = $this->GetFactors($prices->Prices->Timeseries->{$today}, $rates);
 		$divider = $factors->Divider;
 		$rate = $factors->Rate;
 		$vat = 1 + $this->ReadPropertyInteger('VAT')/100;
-
-		$date = new DateTime('Now');
-		$today = $date->format('Ymd');
-		$date->add(DateInterval::createFromDateString('1 day'));
-		$tomorrow = $date->format('Ymd');
 		
 		$points = [];
 
