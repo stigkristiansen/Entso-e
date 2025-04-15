@@ -251,7 +251,7 @@ class EntsoEGateway extends IPSModule {
 				$key = $date->format('Ymd');
 				$timeseries[$key]['Points'] = $points;
 				$timeseries[$key]['Currency'] = $currency;
-				$timeseries[$key]['MeasureUnit'] = $priceMeasureUnitName
+				$timeseries[$key]['MeasureUnit'] = $priceMeasureUnitName;
 
 			}
 			
