@@ -182,7 +182,8 @@ class DayAheadPrices extends IPSModule {
 
 
 	private function GetFactors($Prices, $Rates) {
-		switch(strtolower($Prices->Prices->MeasureUnit)) {
+		//switch(strtolower($Prices->Prices->MeasureUnit)) {
+		switch(strtolower($Prices->MeasureUnit)) {
 			case 'wh':
 				$divider = 0.001;
 				break;
@@ -272,20 +273,22 @@ class DayAheadPrices extends IPSModule {
 		$prices = json_decode($this->ReadAttributeString('Prices'));
 		$rates =  json_decode($this->ReadAttributeString('Rates'));
 		
-		$factors = $this->GetFactors($prices, $rates);
+		$points = [];
+		$date = new DateTime('Now');
+		$today = $date->format('Ymd');
+		
+		//$factors = $this->GetFactors($prices, $rates);
+		$factors = $this->GetFactors($prices->Prices->Timeseries->{$today}, $rates);
 		$divider = $factors->Divider;
 		$rate = $factors->Rate;
 		$vat = 1 + $this->ReadPropertyInteger('VAT')/100;
 		
-		$points = [];
-		$date = new DateTime('Now');
-		$today = $date->format('Ymd');
-
-		if(isset($prices->Prices->Timeseries->{$today})) {
-			$max = count($prices->Prices->Timeseries->{$today});
+		//if(isset($prices->Prices->Timeseries->{$today})) {
+		if(isset($prices->Prices->Timeseries->{$today}->Points)) {
+			$max = count($prices->Prices->Timeseries->{$today}->Points);
 			for($i=0;$i<$max;$i++) {
-				$price = $prices->Prices->Timeseries->{$today}[$i]->price;
-				$position = $prices->Prices->Timeseries->{$today}[$i]->position;
+				$price = $prices->Prices->Timeseries->{$today}->Points[$i]->price;
+				$position = $prices->Prices->Timeseries->{$today}->Points[$i]->position;
 				
 				//$points[$position-1] = $price/$divider*$rate*$vat;
 				$points[] = $price/$divider*$rate*$vat;
@@ -294,7 +297,8 @@ class DayAheadPrices extends IPSModule {
 			ksort($points);
 		}
 
-		$entsoeCurrency = $prices->Prices->Currency;
+		//$entsoeCurrency = $prices->Prices->Currency;
+		$entsoeCurrency = $prices->Prices->Timeseries->{$today}->Currency;
 		$this->SendDebug(__FUNCTION__, sprintf('Prices from Entso-e are reported in %s', $entsoeCurrency), 0);
 		
 		$this->SendDebug(__FUNCTION__, sprintf('Variables show prices in %s', $this->ReadPropertyString('ReportCurrency')), 0);

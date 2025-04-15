@@ -204,8 +204,8 @@ class EntsoEGateway extends IPSModule {
 			}
 		
 			
-			$currency = (string)$xml->{"TimeSeries"}->{"currency_Unit.name"};
-			$priceMeasureUnitName = (string)$xml->{"TimeSeries"}->{"price_Measure_Unit.name"};
+			//$currency = (string)$xml->{"TimeSeries"}->{"currency_Unit.name"};
+			//$priceMeasureUnitName = (string)$xml->{"TimeSeries"}->{"price_Measure_Unit.name"};
 	
 			$timeseries = [];
 			$timezone = new DateTimeZone(date('e'));
@@ -215,6 +215,8 @@ class EntsoEGateway extends IPSModule {
 				$date->setTimezone($timezone);
 
 				$resolution = (string)$xml->{"TimeSeries"}->{"Period"}->{"resolution"};
+				$currency = (string)$xml->{"TimeSeries"}->{"currency_Unit.name"};
+				$priceMeasureUnitName = (string)$xml->{"TimeSeries"}->{"price_Measure_Unit.name"};
 
 				switch(strtoupper($resolution)) {
 					case 'PT60M':
@@ -243,8 +245,13 @@ class EntsoEGateway extends IPSModule {
 						$position+=$increment;
 					}
 				}     
-	
-				$timeseries[$date->format('Ymd')] = $points;
+				
+				// $timeseries[$date->format('Ymd')] = $points;
+
+				$key = $date->format('Ymd');
+				$timeseries[$key]['Points'] = $points;
+				$timeseries[$key]['Currency'] = $currency;
+				$timeseries[$key]['MeasureUnit'] = $priceMeasureUnitName
 
 			}
 			
