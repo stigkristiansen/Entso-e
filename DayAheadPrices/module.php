@@ -180,9 +180,8 @@ class DayAheadPrices extends IPSModule {
 	}
 
 
-
 	private function GetFactors($Prices, $Rates) {
-		//switch(strtolower($Prices->Prices->MeasureUnit)) {
+		
 		switch(strtolower($Prices->MeasureUnit)) {
 			case 'wh':
 				$divider = 0.001;
@@ -197,9 +196,6 @@ class DayAheadPrices extends IPSModule {
 				$divider = 1000000;
 				break;
 		}
-
-		$this->SendDebug(__FUNCTION__, sprintf('Rates: %s', json_encode($Rates)), 0);
-		$this->SendDebug(__FUNCTION__, sprintf('Prices: %s', json_encode($Prices)), 0);
 
 		$reportCurrency = $this->ReadPropertyString('ReportCurrency');
 		switch($reportCurrency) {
@@ -229,7 +225,6 @@ class DayAheadPrices extends IPSModule {
 		$date->add(DateInterval::createFromDateString('1 day'));
 		$tomorrow = $date->format('Ymd');
 		
-		//$factors = $this->GetFactors($prices, $rates);
 		$factors = $this->GetFactors($prices->Prices->Timeseries->{$today}, $rates);
 		$divider = $factors->Divider;
 		$rate = $factors->Rate;
@@ -237,7 +232,6 @@ class DayAheadPrices extends IPSModule {
 		
 		$points = [];
 
-		//if(isset($prices->Prices->Timeseries->{$today})) {
 		if(isset($prices->Prices->Timeseries->{$today}->Points)) {
 			$max = count($prices->Prices->Timeseries->{$today}->Points);
 			for($i=0;$i<$max;$i++) {
@@ -253,7 +247,6 @@ class DayAheadPrices extends IPSModule {
 			$points['today'] = array_values($todayPoints);	
 		}
 
-		//if(isset($prices->Prices->Timeseries->{$tomorrow})) {
 		if(isset($prices->Prices->Timeseries->{$tomorrow}->Points)) {
 			$max = count($prices->Prices->Timeseries->{$tomorrow}->Points);
 			for($i=0;$i<$max;$i++) {
@@ -284,27 +277,26 @@ class DayAheadPrices extends IPSModule {
 		$date = new DateTime('Now');
 		$today = $date->format('Ymd');
 		
-		//$factors = $this->GetFactors($prices, $rates);
 		$factors = $this->GetFactors($prices->Prices->Timeseries->{$today}, $rates);
 		$divider = $factors->Divider;
 		$rate = $factors->Rate;
 		$vat = 1 + $this->ReadPropertyInteger('VAT')/100;
 		
-		//if(isset($prices->Prices->Timeseries->{$today})) {
 		if(isset($prices->Prices->Timeseries->{$today}->Points)) {
 			$max = count($prices->Prices->Timeseries->{$today}->Points);
 			for($i=0;$i<$max;$i++) {
 				$price = $prices->Prices->Timeseries->{$today}->Points[$i]->price;
 				$position = $prices->Prices->Timeseries->{$today}->Points[$i]->position;
 				
-				//$points[$position-1] = $price/$divider*$rate*$vat;
-				$points[] = $price/$divider*$rate*$vat;
+				$points[$position-1] = $price/$divider*$rate*$vat;
+				//$points[] = $price/$divider*$rate*$vat;
 			}
 			
 			ksort($points);
+
+			$points = array_values($points);
 		}
 
-		//$entsoeCurrency = $prices->Prices->Currency;
 		$entsoeCurrency = $prices->Prices->Timeseries->{$today}->Currency;
 		$this->SendDebug(__FUNCTION__, sprintf('Prices from Entso-e are reported in %s', $entsoeCurrency), 0);
 		
@@ -336,8 +328,6 @@ class DayAheadPrices extends IPSModule {
 			$this->SendDebug(__FUNCTION__, sprintf('Evaluation of data in attribute "%s" is always set to TRUE', $Name), 0);
 			return true;
 		}
-
-		return true; //Remove
 
 		$fetchData = false;
 
@@ -430,22 +420,23 @@ class DayAheadPrices extends IPSModule {
 		$today = $date->format('Ymd');
 
 		if(isset($prices->Prices->Timeseries->{$today}->Points)) {
+			$todayPoints = [];
 			$max = count($prices->Prices->Timeseries->{$today}->Points);
 			for($i=0;$i<$max;$i++) {
 				$price = $prices->Prices->Timeseries->{$today}->Points[$i]->price;
 				$position = $prices->Prices->Timeseries->{$today}->Points[$i]->position;
 				
-				$points[] = $price;
-				//$points[$position-1] = $price;
+				//$points[] = $price;
+				$todayPoints[$position-1] = $price;
 			}
 			
-			ksort($points);
+			ksort($todayPoints);
+
+			$points = array_values($todayPoints);
 		} else {
-			return $points;
+			return $todayPoints;
 		}
 		
-		//$points = $prices->Prices->Points;
-
 		$this->SendDebug(__FUNCTION__, sprintf('Hourly prices: %s', json_encode($points)), 0);
 
 		$this->SendDebug(__FUNCTION__, sprintf('Searching for lowest price interval for %d hours', $Timeframe), 0);
