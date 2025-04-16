@@ -277,7 +277,7 @@ class EntsoEGateway extends IPSModule {
 			$uniqueCurrencies = array_unique($currencies);
 
 			foreach($uniqueCurrencies as $currency) {
-				$rates[$curency] = $this->GetExchangeRates($currency);
+				$rates[$currency] = $this->GetExchangeRates($currency);
 			}
 
 			$return['Rates'] = $rates;
