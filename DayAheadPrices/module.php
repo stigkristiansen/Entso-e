@@ -36,6 +36,7 @@ class DayAheadPrices extends IPSModule {
 		$this->RegisterMessage(0, IPS_KERNELMESSAGE);
 	}
 
+
 	public function Destroy() {
 		$module = json_decode(file_get_contents(__DIR__ . '/module.json'));
 		if(count(IPS_GetInstanceListByModuleID($module->id))==0) {
@@ -45,6 +46,7 @@ class DayAheadPrices extends IPSModule {
 		//Never delete this line!
 		parent::Destroy();
 	}
+
 
 	public function ApplyChanges() {
 		//Never delete this line!
@@ -74,6 +76,7 @@ class DayAheadPrices extends IPSModule {
 		$this->HandleData();
 	}
 
+
 	public function MessageSink($TimeStamp, $SenderID, $Message, $Data) {
 		parent::MessageSink($TimeStamp, $SenderID, $Message, $Data);
 
@@ -81,6 +84,7 @@ class DayAheadPrices extends IPSModule {
 			$this->InitTimer();
 		}
 	}
+
 
 	public function RequestAction($Ident, $Value) {
 		try {
@@ -98,6 +102,7 @@ class DayAheadPrices extends IPSModule {
 			$this->SendDebug(__FUNCTION__, sprintf('RequestAction failed. The error was "%s"', $e->getMessage()), 0);
 		}
 	}	
+
 
 	public function ReceiveData($JSONString) {
 		$data = json_decode($JSONString);
@@ -147,15 +152,18 @@ class DayAheadPrices extends IPSModule {
 
 	}
 
+
 	private function InitTimer() {
 		$this->SetTimerInterval('EntoseDayAheadRefresh' . (string)$this->InstanceID, (self::SecondsToNextHour()+1)*1000); 
 	}
+
 
 	private function Refresh() {
 		$this->InitTimer();
 
 		$this->HandleData();
 	}
+
 
 	private function HandleData() {
 		$fetchPrices = $this->EvaluateAttribute('Prices');
@@ -216,6 +224,7 @@ class DayAheadPrices extends IPSModule {
 		return (object)array('Divider'=>$divider, 'Rate'=>$rate);
 	}
 
+
 	private function UpdateGraph() {
 		$prices = json_decode($this->ReadAttributeString('Prices'));
 		$rates =  json_decode($this->ReadAttributeString('Rates'));
@@ -239,7 +248,6 @@ class DayAheadPrices extends IPSModule {
 				$position = $prices->Prices->Timeseries->{$today}->Points[$i]->position;
 				
 				$todayPoints[$position-1] = $price/$divider*$rate*$vat;
-				//$todayPoints[] = $price/$divider*$rate*$vat;
 			}
 
 			ksort($todayPoints);
@@ -254,7 +262,6 @@ class DayAheadPrices extends IPSModule {
 				$position = $prices->Prices->Timeseries->{$tomorrow}->Points[$i]->position;
 
 				$tomorrowPoints[$position-1] = $price/$divider*$rate*$vat;
-				//$tomorrowPoints[] = $price/$divider*$rate*$vat;
 			}
 
 			ksort($tomorrowPoints);
@@ -268,6 +275,7 @@ class DayAheadPrices extends IPSModule {
 		$request[] = ['Function'=>'GetDayAheadPricesGraph', 'RequestId'=>$guid, 'ChildId'=>(string)$this->InstanceID, 'Points'=>$points, 'File'=>$file];
 		$this->SendDataToParent(json_encode(['DataID' => '{8ED8DB86-AFE5-57AD-D638-505C91A39397}', 'Buffer' => $request]));
 	}
+
 
 	private function UpdateVariables() {
 		$prices = json_decode($this->ReadAttributeString('Prices'));
@@ -289,7 +297,6 @@ class DayAheadPrices extends IPSModule {
 				$position = $prices->Prices->Timeseries->{$today}->Points[$i]->position;
 				
 				$points[$position-1] = $price/$divider*$rate*$vat;
-				//$points[] = $price/$divider*$rate*$vat;
 			}
 			
 			ksort($points);
@@ -322,6 +329,7 @@ class DayAheadPrices extends IPSModule {
 		$this->SetValue('Avg', $stats->avg);
 		$this->SetValue('Median', $stats->median);
 	}
+
 
 	private function EvaluateAttribute(string $Name) {
 		if(strtolower($Name)=='prices') {
@@ -359,6 +367,7 @@ class DayAheadPrices extends IPSModule {
 		return $fetchData;
 	}
 
+
 	private function UpdateRates(object $Rates) {
 		$now = new DateTime('Now');
 		$today = $now->format('Y-m-d');
@@ -368,6 +377,7 @@ class DayAheadPrices extends IPSModule {
 		$this->WriteAttributeString('Rates', json_encode($rates));
 	}
 
+
 	private function UpdatePrices(object $Prices) {
 		$now = new DateTime('Now');
 		$today = $now->format('Y-m-d');
@@ -376,7 +386,6 @@ class DayAheadPrices extends IPSModule {
 		$prices['Prices'] = $Prices;
 		$this->WriteAttributeString('Prices', json_encode($prices));
 	}
-
 
 
 	private function GetStats($Prices, $IncludeCurrent = true) {
@@ -405,6 +414,7 @@ class DayAheadPrices extends IPSModule {
 		return (object)$stats;
 	}
 
+
 	public function GetIntervalWithLowestPrice(int $Timeframe) : array {
 		if($Timeframe < 1 || $Timeframe > 8) {
 			throw new Exception('Invalid parameter "Timeframe". Timeframe must be grater than 0 and less than 9'); 
@@ -426,7 +436,6 @@ class DayAheadPrices extends IPSModule {
 				$price = $prices->Prices->Timeseries->{$today}->Points[$i]->price;
 				$position = $prices->Prices->Timeseries->{$today}->Points[$i]->position;
 				
-				//$points[] = $price;
 				$todayPoints[$position-1] = $price;
 			}
 			
@@ -481,7 +490,6 @@ class DayAheadPrices extends IPSModule {
 		$this->SendDebug(__FUNCTION__, sprintf('The lowest price interval is: %s', json_encode($result)), 0);
 
 		return $result;
-
 	}
 
 }

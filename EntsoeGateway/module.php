@@ -22,15 +22,18 @@ class EntsoEGateway extends IPSModule {
 		$this->RegisterPropertyBoolean('SkipSSLCheck', false);
 	}
 
+
 	public function Destroy() {
 		//Never delete this line!
 		parent::Destroy();
 	}
 
+
 	public function ApplyChanges() {
 		//Never delete this line!
 		parent::ApplyChanges();
 	}
+
 
 	public function RequestAction($Ident, $Value) {
 		try {
@@ -49,6 +52,7 @@ class EntsoEGateway extends IPSModule {
 		}
 	}
 
+
 	public function ForwardData($JSONString) {
 		$this->SendDebug(__FUNCTION__, sprintf('Received a request from a child. The request was "%s"', $JSONString), 0);
 
@@ -63,6 +67,7 @@ class EntsoEGateway extends IPSModule {
 
 		return true;
 	}
+
 
 	private function HandleAsyncRequest(string $Requests) {
 		$requests = json_decode($Requests);
@@ -123,6 +128,7 @@ class EntsoEGateway extends IPSModule {
 		}
 	}
 
+
 	private function GetDayAheadPricesGraph(object $Points, string $File, string $ChildId, string $RequestId) {
 		$this->SendDebug(__FUNCTION__, 'Downloading DayAheadPrices Graph...', 0);
 			
@@ -148,6 +154,7 @@ class EntsoEGateway extends IPSModule {
 		$return = array('Function' => 'GetDayAheadPricesGraph', 'File'=> $File);
 		$this->SendDataToChildren(json_encode(["DataID" => "{6E413DE8-C9F0-5E7F-4A69-07993C271FDC}", "ChildId" => $ChildId, "RequestId" => $RequestId,"Buffer" => $return]));
 	}
+
 
 	private function GetDayAheadPrices(string $Area, bool $FetchPrices, bool $FetchRates, string $ChildId, string $RequestId) {
 		$this->SendDebug(__FUNCTION__, 'Requesting Day-Ahead prices....', 0);
@@ -201,11 +208,6 @@ class EntsoEGateway extends IPSModule {
 				throw new Exception('Failed to call Entso-e. Invalid data, missing "Point"');
 			}
 		
-			
-			//$currency = (string)$xml->{"TimeSeries"}->{"currency_Unit.name"};
-			//$priceMeasureUnitName = (string)$xml->{"TimeSeries"}->{"price_Measure_Unit.name"};
-	
-			
 			$timeseries = [];
 			$timezone = new DateTimeZone(date('e'));
 			
@@ -213,15 +215,12 @@ class EntsoEGateway extends IPSModule {
 				$date = new DateTime((string)$xmlTimeserie->{"Period"}->{"timeInterval"}->{"start"});
 				$date->setTimezone($timezone);
 
-
-
 				$resolution = (string)$xml->{"TimeSeries"}->{"Period"}->{"resolution"};
 				$priceMeasureUnitName = (string)$xml->{"TimeSeries"}->{"price_Measure_Unit.name"};
 
 				$currency = (string)$xml->{"TimeSeries"}->{"currency_Unit.name"};
 				$currencies[] =  $currency;
 				
-
 				switch(strtoupper($resolution)) {
 					case 'PT60M':
 						$increment = 1;
@@ -250,8 +249,6 @@ class EntsoEGateway extends IPSModule {
 					}
 				}     
 				
-				// $timeseries[$date->format('Ymd')] = $points;
-
 				$key = $date->format('Ymd');
 				$timeseries[$key]['Points'] = $points;
 				$timeseries[$key]['Currency'] = $currency;
@@ -282,6 +279,7 @@ class EntsoEGateway extends IPSModule {
 		$this->SendDebug(__FUNCTION__, sprintf('Returning day-Ahead Prices to requesting child with Ident %s. Result sent is %s...',  $ChildId, json_encode($return)), 0);
 		$this->SendDataToChildren(json_encode(["DataID" => "{6E413DE8-C9F0-5E7F-4A69-07993C271FDC}", "ChildId" => $ChildId, "RequestId" => $RequestId,"Buffer" => $return]));
 	}
+
 
 	private function GetExchangeRates(string $Currency) { 
 		$this->SendDebug(__FUNCTION__, 'Requesting Exchange rate....', 0);
