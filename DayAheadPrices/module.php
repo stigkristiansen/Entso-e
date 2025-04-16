@@ -198,19 +198,20 @@ class DayAheadPrices extends IPSModule {
 				break;
 		}
 
+
 		$reportCurrency = $this->ReadPropertyString('ReportCurrency');
 		switch($reportCurrency) {
 			case 'NOK':
-				$rate = $Rates->Rates->rates[$reportCurrency]->NOK;
+				$rate = $Rates->Rates->rates[$Prices->Currency]->NOK;
 				break;
 			case 'EUR':
-				$rate = $rates->Rates->rates[$reportCurrency]->EUR;
+				$rate = $rates->Rates->rates[$Prices->Currency]->EUR;
 				break;
 			case 'SEK':
-				$rate = $rates->Rates->rates[$reportCurrency]->SEK;
+				$rate = $rates->Rates->rates[$Prices->Currency]->SEK;
 				break;
 			case 'DKK':
-				$rate = $rates->Rates->rates[$reportCurrency]->DKK;
+				$rate = $rates->Rates->rates[$Prices->Currency]->DKK;
 				break;
 		}
 
