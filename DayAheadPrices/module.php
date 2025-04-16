@@ -199,6 +199,7 @@ class DayAheadPrices extends IPSModule {
 		}
 
 		$this->SendDebug(__FUNCTION__, sprintf('Rates: %s', json_encode($Rates)), 0);
+		$this->SendDebug(__FUNCTION__, sprintf('Prices: %s', json_encode($Prices)), 0);
 
 		$reportCurrency = $this->ReadPropertyString('ReportCurrency');
 		switch($reportCurrency) {
