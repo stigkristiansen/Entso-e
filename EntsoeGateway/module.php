@@ -125,8 +125,7 @@ class EntsoEGateway extends IPSModule {
 
 	private function GetDayAheadPricesGraph(object $Points, string $File, string $ChildId, string $RequestId) {
 		$this->SendDebug(__FUNCTION__, 'Downloading DayAheadPrices Graph...', 0);
-		
-		
+			
 		for($i=0;$i<23;$i++) {
 			$hours[]=$i;
 		}
