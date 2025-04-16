@@ -337,6 +337,8 @@ class DayAheadPrices extends IPSModule {
 			return true;
 		}
 
+		return true; //Remove
+
 		$fetchData = false;
 
 		$now = new DateTime('Now');
