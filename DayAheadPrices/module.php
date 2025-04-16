@@ -198,18 +198,19 @@ class DayAheadPrices extends IPSModule {
 				break;
 		}
 
-		switch($this->ReadPropertyString('ReportCurrency')) {
+		$reportCurrency = $this->ReadPropertyString('ReportCurrency');
+		switch($reportCurrency) {
 			case 'NOK':
-				$rate = $Rates->Rates->rates->NOK;
+				$rate = $Rates->Rates->rates[$reportCurrency]->NOK;
 				break;
 			case 'EUR':
-				$rate = $rates->Rates->rates->EUR;
+				$rate = $rates->Rates->rates[$reportCurrency]->EUR;
 				break;
 			case 'SEK':
-				$rate = $rates->Rates->rates->SEK;
+				$rate = $rates->Rates->rates[$reportCurrency]->SEK;
 				break;
 			case 'DKK':
-				$rate = $rates->Rates->rates->DKK;
+				$rate = $rates->Rates->rates[$reportCurrency]->DKK;
 				break;
 		}
 
@@ -423,13 +424,14 @@ class DayAheadPrices extends IPSModule {
 		$date = new DateTime('Now');
 		$today = $date->format('Ymd');
 
-		if(isset($prices->Prices->Timeseries->{$today})) {
-			$max = count($prices->Prices->Timeseries->{$today});
+		if(isset($prices->Prices->Timeseries->{$today}->Points)) {
+			$max = count($prices->Prices->Timeseries->{$today}->Points);
 			for($i=0;$i<$max;$i++) {
-				$price = $prices->Prices->Timeseries->{$today}[$i]->price;
-				$position = $prices->Prices->Timeseries->{$today}[$i]->position;
+				$price = $prices->Prices->Timeseries->{$today}->Points[$i]->price;
+				$position = $prices->Prices->Timeseries->{$today}->Points[$i]->position;
 				
-				$points[$position-1] = $price;
+				$points[] = $price;
+				//$points[$position-1] = $price;
 			}
 			
 			ksort($points);

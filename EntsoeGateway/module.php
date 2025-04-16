@@ -158,6 +158,8 @@ class EntsoEGateway extends IPSModule {
 
 		$return = array('Function' => 'GetDayAheadPrices');
 		$return['RequestId'] = $RequestId;
+
+		$currencies = [];
 		
 		if($FetchPrices) {
 			$apiKey = $this->ReadPropertyString('ApiKey');
@@ -207,6 +209,7 @@ class EntsoEGateway extends IPSModule {
 			//$currency = (string)$xml->{"TimeSeries"}->{"currency_Unit.name"};
 			//$priceMeasureUnitName = (string)$xml->{"TimeSeries"}->{"price_Measure_Unit.name"};
 	
+			
 			$timeseries = [];
 			$timezone = new DateTimeZone(date('e'));
 			
@@ -214,9 +217,14 @@ class EntsoEGateway extends IPSModule {
 				$date = new DateTime((string)$xmlTimeserie->{"Period"}->{"timeInterval"}->{"start"});
 				$date->setTimezone($timezone);
 
+
+
 				$resolution = (string)$xml->{"TimeSeries"}->{"Period"}->{"resolution"};
-				$currency = (string)$xml->{"TimeSeries"}->{"currency_Unit.name"};
 				$priceMeasureUnitName = (string)$xml->{"TimeSeries"}->{"price_Measure_Unit.name"};
+
+				$currency = (string)$xml->{"TimeSeries"}->{"currency_Unit.name"};
+				$currencies[] =  $currency;
+				
 
 				switch(strtoupper($resolution)) {
 					case 'PT60M':
@@ -264,7 +272,15 @@ class EntsoEGateway extends IPSModule {
 		}
 
 		if($FetchRates) {
-			$return['Rates'] = $this->GetExchangeRates($currency);
+			$rates = [];
+
+			$uniqueCurrencies = array_unique($currencies);
+
+			foreach($uniqueCurrencies as $currency) {
+				$rates[$curency] = $this->GetExchangeRates($currency);
+			}
+
+			$return['Rates'] = $rates;
 		}
 				
 		$this->SendDebug(__FUNCTION__, sprintf('Returning day-Ahead Prices to requesting child with Ident %s. Result sent is %s...',  $ChildId, json_encode($return)), 0);
