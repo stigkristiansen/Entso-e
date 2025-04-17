@@ -469,7 +469,8 @@ class DayAheadPrices extends IPSModule {
 			}
 		}
 
-		$factors = $this->GetFactors($prices, $rates);
+		
+		$factors = $this->GetFactors($prices->Prices->Timeseries->{$today}, $rates);
 		$divider = $factors->Divider;
 		$rate = $factors->Rate;
 		$vat = 1 + $this->ReadPropertyInteger('VAT')/100;
