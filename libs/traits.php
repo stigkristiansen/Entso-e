@@ -35,7 +35,7 @@ trait WebCall {
         curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true );
 	    
-        $this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Calling %s', $url ), 0);
+        $this->SendDebug(__FUNCTION__, sprintf('Calling %s', $url ), 0);
 
 		$result = curl_exec($ch);
 
@@ -45,7 +45,7 @@ trait WebCall {
 			$response['success'] = false;
 			$response['errortext'] = curl_error($ch);
 
-			$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Call failed. The error was %s: %s', $response['httpcode'], $response['errortext'] ), 0);
+			$this->SendDebug(__FUNCTION__, sprintf('Call failed. The error was %s: %s', $response['httpcode'], $response['errortext'] ), 0);
 
 			return (object)$response;
 		} 
@@ -53,7 +53,7 @@ trait WebCall {
 		$response ['success'] = true;
 		$response['result'] = self::isJson($result)?json_decode($result):$result;
 
-		$this->SendDebug(IPS_GetName($this->InstanceID), sprintf('Call returned: %s', $result), 0);
+		$this->SendDebug(__FUNCTION__, sprintf('Call returned: %s', $result), 0);
 		
 		return  (object)$response;
 	}
